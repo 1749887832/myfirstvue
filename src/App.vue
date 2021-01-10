@@ -1,8 +1,6 @@
 <template>
   <div id="app">
-    <router-link to="/home">首页</router-link>
-    <router-link to="/list">list</router-link>
-    <!--    放置路由-->
+    <!--    放置路由,路由占位符-->
     <router-view></router-view>
   </div>
 </template>

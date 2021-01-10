@@ -5,18 +5,15 @@ Vue.use(router)
 
 export default new router({
     routes: [
+        //路由重定向
         {
-            path: '/home',
-            name: 'home',
-            component: () => import('./components/home')
+            path:'/',
+            redirect:'/login'
         },
         {
-            path:'/list',
-            name:'list',
-            component:() => import('./components/list')
-        },
-        {
-            path:'*',
-            redirect:'/home'
-        }]
+            path:'/login',
+            name:'login',
+            component:() => import('./components/login')
+        }
+        ]
 })
