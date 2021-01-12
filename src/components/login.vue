@@ -25,6 +25,8 @@
 </template>
 
 <script>
+import Message from "element-ui";
+
 export default {
   name: "login",
   data() {
@@ -63,9 +65,11 @@ export default {
             this.$qs.stringify(this.LoginForm))
             .then(function (res) {
               console.log(res.data)
+              Message.Message.success('登录成功')
             })
             .catch(function (res) {
               console.log(res)
+              Message.Message.error('网络错误')
             })
       });
     }
