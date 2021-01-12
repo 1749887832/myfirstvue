@@ -34,7 +34,7 @@ export default {
       //这是登录页面的数据绑定
       LoginForm: {
         username: 'liu',
-        password: '123'
+        password: '123456'
       },
       //这是表单的验证规则
       loginFormRules: {
@@ -61,11 +61,15 @@ export default {
       this.$refs.loginFormRef.validate(async valid => {
         console.log(valid)
         if (!valid) return;
+        let _this = this
         this.$http.post('api/ceshi/',
             this.$qs.stringify(this.LoginForm))
             .then(function (res) {
               console.log(res.data)
               Message.Message.success('登录成功')
+              // 保存token
+              window.sessionStorage.setItem('token','123123123')
+              return _this.$router.push({path:'/home'})
             })
             .catch(function (res) {
               console.log(res)

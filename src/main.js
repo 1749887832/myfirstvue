@@ -10,6 +10,12 @@ Vue.prototype.$http = axios
 Vue.prototype.$qs = qs
 // 配置请求的根路径
 Vue.config.productionTip = false
+axios.interceptors.request.use(config =>{
+  console.log(config)
+  // 在最后必须return 这个config
+  config.headers.Authorization = window.sessionStorage.getItem('token')
+  return config
+})
 new Vue({
   router,
   render: h => h(App),

@@ -1,22 +1,50 @@
 import Vue from 'vue'
-import router from 'vue-router'
+import Router from 'vue-router'
 
-Vue.use(router)
+Vue.use(Router)
 
-export default new router({
+const router = new Router({
     /*
     * mode: 'history',
     * */
     routes: [
         //路由重定向
         {
-            path:'/',
-            redirect:'/login'
+            path: '/',
+            redirect: '/login'
         },
         {
-            path:'/login',
-            name:'login',
-            component:() => import('./components/login')
-        }
-        ]
+            path: '/login',
+            name: 'login',
+            component: () => import('./components/login')
+        },
+        {
+            path: '/home',
+            name: 'home',
+            component: () => import('./components/home')
+        },
+    ]
 })
+
+//挂载路由导航守卫
+router.beforeEach((to, from, next) => {
+    // to将要访问的路径
+    // from 代表从哪个路径跳转而来
+    // next 是一个函数，表示放行
+    // next() 放行 next('/login') 强制跳转
+    if (to.path === '/login') {
+        return next()
+    } else {
+        // 清除token
+        const tokenStr = window.sessionStorage.getItem('token')
+        if (!tokenStr) {
+            return next('/login')
+        } else {
+            next()
+        }
+    }
+
+
+})
+
+export default router
