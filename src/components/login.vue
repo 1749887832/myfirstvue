@@ -43,24 +43,30 @@ export default {
         ],
         //验证密码是否合法
         password: [
-          {required:true, message:'请输入登录密码', trigger: 'blur'},
-          {min:6, max:10, message: '长度在6-10个字符', trigger: 'blur'}
+          {required: true, message: '请输入登录密码', trigger: 'blur'},
+          {min: 6, max: 10, message: '长度在6-10个字符', trigger: 'blur'}
         ]
       }
     }
   },
-  methods:{
+  methods: {
     //点击重置按钮，重置登录表单
-    resetLgoinForm(){
+    resetLgoinForm() {
       console.log(this)
       this.$refs.loginFormRef.resetFields();
     },
-    login(){
-      this.$refs.loginFormRef.validate(async valid =>{
+    login() {
+      this.$refs.loginFormRef.validate(async valid => {
         console.log(valid)
         if (!valid) return;
-        const result = await this.$http.post('ceshi/',this.LoginForm)
-        console.log(result)
+        this.$http.post('api/ceshi/',
+            this.$qs.stringify(this.LoginForm))
+            .then(function (res) {
+              console.log(res.data)
+            })
+            .catch(function (res) {
+              console.log(res)
+            })
       });
     }
   }
