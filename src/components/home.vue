@@ -16,19 +16,19 @@
             class="el-menu-vertical-demo"
             background-color="#373d41"
             text-color="#fff"
-            active-text-color="#ffd04b">
-          <el-submenu index="1">
+            active-text-color="#409EFF">
+          <el-submenu :index="item.id+''" v-for="item in menulist" :key="item.id">
             <!--              一级菜单的模板区域-->
             <template slot="title">
               <!--              图标-->
-              <i class="el-icon-location"></i>
-              <span>导航一</span>
+              <i :class="item.icon"></i>
+              <span>{{ item.authName}}</span>
             </template>
             <!--            二级菜单-->
-            <el-menu-item index="1-4-1">
-              <i class="el-icon-location"></i>
-              <span>选项1</span>
-              </el-menu-item>
+            <el-menu-item :index="subItem.id"  v-for="subItem in item.children" :key="subItem.id">
+              <i class="el-icon-menu"></i>
+              <span>{{subItem.name}}</span>
+            </el-menu-item>
           </el-submenu>
         </el-menu>
       </el-aside>
@@ -38,13 +38,55 @@
 </template>
 
 <script>
+
 export default {
+  data() {
+    return {
+      // 左侧菜单数据
+      menulist: [
+        {
+          'authName': '用户管理',
+          'children': [
+            {
+              'id':'11',
+              'name':'子菜单1'
+            },
+            {
+              'id':'12',
+              'name':'子菜单2'
+            },
+          ],
+          'id': 1,
+          'order': 2,
+          'path': 'users',
+          'icon':'el-icon-s-grid',
+        },
+        {
+          'authName': '商品管理',
+          'children': [
+            {
+              'id':'21',
+              'name':'子菜单3'
+            },
+            {
+              'id':'22',
+              'name':'子菜单4'
+            },
+          ],
+          'id': 2,
+          'order': 3,
+          'path': 'users',
+          'icon': 'el-icon-s-data',
+        },
+      ]
+    }
+  },
   name: "home",
   methods: {
     logout() {
       window.sessionStorage.clear()
       this.$router.push({path: '/login'})
-    }
+    },
   }
 }
 </script>
