@@ -4,7 +4,7 @@
     <el-header>
       <div>
         <img src="../assets/logo.png" alt="">
-        <span>接口自动化平台</span>
+        <span>首页</span>
       </div>
       <el-button type="info" @click="logout">退出</el-button>
     </el-header>
@@ -17,19 +17,27 @@
             background-color="#373d41"
             text-color="#fff"
             active-text-color="#409EFF">
-          <el-submenu :index="item.id+''" v-for="item in menulist" :key="item.id">
-            <!--              一级菜单的模板区域-->
-            <template slot="title">
-              <!--              图标-->
-              <i :class="item.icon"></i>
-              <span>{{ item.authName}}</span>
+          <template v-for="item in menulist">
+            <el-submenu v-if="item.children.length !== 0" :index="item.id+''" :key="item.id">
+              <!--              一级菜单的模板区域-->
+              <template slot="title">
+                <!--              图标-->
+                <i :class="item.icon"></i>
+                <span>{{ item.authName }}</span>
+              </template>
+              <!--            二级菜单-->
+              <el-menu-item :index="subItem.id" v-for="subItem in item.children" :key="subItem.id">
+                <i :class="subItem.icon"></i>
+                <span>{{ subItem.name }}</span>
+              </el-menu-item>
+            </el-submenu>
+            <template v-else>
+              <el-menu-item :index="item.id+''" :key="item.id">
+                <i :class="item.icon"></i>
+                <span>{{ item.authName }}</span>
+              </el-menu-item>
             </template>
-            <!--            二级菜单-->
-            <el-menu-item :index="subItem.id"  v-for="subItem in item.children" :key="subItem.id">
-              <i class="el-icon-menu"></i>
-              <span>{{subItem.name}}</span>
-            </el-menu-item>
-          </el-submenu>
+          </template>
         </el-menu>
       </el-aside>
       <el-main>Main</el-main>
@@ -45,38 +53,71 @@ export default {
       // 左侧菜单数据
       menulist: [
         {
-          'authName': '用户管理',
-          'children': [
-            {
-              'id':'11',
-              'name':'子菜单1'
-            },
-            {
-              'id':'12',
-              'name':'子菜单2'
-            },
-          ],
+          'authName': '首页',
+          'children': [],
           'id': 1,
-          'order': 2,
           'path': 'users',
-          'icon':'el-icon-s-grid',
+          'icon': 'el-icon-s-home',
         },
         {
-          'authName': '商品管理',
+          'authName': '模块',
           'children': [
             {
-              'id':'21',
-              'name':'子菜单3'
+              'id': '2-1',
+              'name': '模块1',
+              'path': 'users',
+              'icon': 'el-icon-monitor',
             },
             {
-              'id':'22',
-              'name':'子菜单4'
+              'id': '2-2',
+              'name': '模块2',
+              'path': 'users',
+              'icon': 'el-icon-monitor',
             },
           ],
           'id': 2,
-          'order': 3,
+          'path': 'users',
+          'icon': 'el-icon-s-marketing',
+        },
+        {
+          'authName': '统计',
+          'children': [
+            {
+              'id': '3-1',
+              'name': '统计1',
+              'path': 'users',
+              'icon': 'el-icon-monitor',
+            },
+            {
+              'id': '3-2',
+              'name': '统计2',
+              'path': 'users',
+              'icon': 'el-icon-monitor',
+            },
+          ],
+          'id': 3,
           'path': 'users',
           'icon': 'el-icon-s-data',
+        },
+        {
+          'authName': '设置',
+          'children': [
+            {
+              'id': '4-1',
+              'name': '设置1',
+              'path': 'users',
+              'icon': 'el-icon-monitor',
+            },
+            {
+              'id': '4-2',
+              'name': '设置2',
+              'path': 'users',
+              'icon': 'el-icon-monitor',
+            },
+          ],
+          'id': 4,
+          'path': 'users',
+          'icon': 'el-icon-setting',
         },
       ]
     }
@@ -120,6 +161,10 @@ export default {
       width: 40px;
     }
   }
+}
+
+.el-menu {
+  width: 100%;
 }
 
 .el-aside {
