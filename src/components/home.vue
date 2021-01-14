@@ -10,15 +10,21 @@
     </el-header>
     <!--    主体区-->
     <el-container>
-      <el-aside width="200px">
+      <el-aside :width="isCollapse?'64px':'200px'">
+        <div class="toggle-button" @click="toggleCollapse">|||</div>
         <el-menu
-            default-active="2"
+            mode="vertical"
+            :collapse="isCollapse"
+            :default-active="activePath"
             class="el-menu-vertical-demo"
             background-color="#373d41"
             text-color="#fff"
-            active-text-color="#409EFF">
+            active-text-color="#409EFF"
+            unique-opened
+            collapse-transition
+            router>
           <template v-for="item in menulist">
-            <el-submenu v-if="item.children.length !== 0" :index="item.id+''" :key="item.id">
+            <el-submenu v-if="item.children.length !== 0" :index="item.path+''" :key="item.id">
               <!--              一级菜单的模板区域-->
               <template slot="title">
                 <!--              图标-->
@@ -26,13 +32,13 @@
                 <span>{{ item.authName }}</span>
               </template>
               <!--            二级菜单-->
-              <el-menu-item :index="subItem.id" v-for="subItem in item.children" :key="subItem.id">
+              <el-menu-item :index="subItem.path" v-for="subItem in item.children" :key="subItem.id" @click="saveNavState(subItem.path)">
                 <i :class="subItem.icon"></i>
                 <span>{{ subItem.name }}</span>
               </el-menu-item>
             </el-submenu>
             <template v-else>
-              <el-menu-item :index="item.id+''" :key="item.id">
+              <el-menu-item :index="item.path+''" :key="item.id" @click="saveNavState(item.path)">
                 <i :class="item.icon"></i>
                 <span>{{ item.authName }}</span>
               </el-menu-item>
@@ -40,7 +46,10 @@
           </template>
         </el-menu>
       </el-aside>
-      <el-main>Main</el-main>
+      <el-main>
+        <!--        放一个路由占位符-->
+        <router-view></router-view>
+      </el-main>
     </el-container>
   </el-container>
 </template>
@@ -48,15 +57,18 @@
 <script>
 
 export default {
+  created() {
+    this.activePath = window.sessionStorage.getItem('activePath')
+  },
   data() {
     return {
       // 左侧菜单数据
       menulist: [
         {
-          'authName': '首页',
+          'authName': '首页管理',
           'children': [],
           'id': 1,
-          'path': 'users',
+          'path': 'welcome',
           'icon': 'el-icon-s-home',
         },
         {
@@ -71,7 +83,7 @@ export default {
             {
               'id': '2-2',
               'name': '模块2',
-              'path': 'users',
+              'path': 'users2',
               'icon': 'el-icon-monitor',
             },
           ],
@@ -85,18 +97,18 @@ export default {
             {
               'id': '3-1',
               'name': '统计1',
-              'path': 'users',
+              'path': 'users3',
               'icon': 'el-icon-monitor',
             },
             {
               'id': '3-2',
               'name': '统计2',
-              'path': 'users',
+              'path': 'users4',
               'icon': 'el-icon-monitor',
             },
           ],
           'id': 3,
-          'path': 'users',
+          'path': 'users5',
           'icon': 'el-icon-s-data',
         },
         {
@@ -105,21 +117,25 @@ export default {
             {
               'id': '4-1',
               'name': '设置1',
-              'path': 'users',
+              'path': 'users6',
               'icon': 'el-icon-monitor',
             },
             {
               'id': '4-2',
               'name': '设置2',
-              'path': 'users',
+              'path': 'users7',
               'icon': 'el-icon-monitor',
             },
           ],
           'id': 4,
-          'path': 'users',
+          'path': 'users8',
           'icon': 'el-icon-setting',
         },
-      ]
+      ],
+      // 是否折叠
+      isCollapse: false,
+      // 保存链接的激活状态
+      activePath: ''
     }
   },
   name: "home",
@@ -128,6 +144,16 @@ export default {
       window.sessionStorage.clear()
       this.$router.push({path: '/login'})
     },
+    // 这是点击按钮的折叠和展开
+    toggleCollapse() {
+      // 是否折叠
+      this.isCollapse = !this.isCollapse
+    },
+    // 保存连接的激活状态
+    saveNavState(activePath){
+      window.sessionStorage.setItem('activePath',activePath)
+      this.activePath = activePath
+    }
   }
 }
 </script>
@@ -163,15 +189,24 @@ export default {
   }
 }
 
-.el-menu {
-  width: 100%;
-}
-
 .el-aside {
   background-color: #373d41;
+
+  .el-menu {
+    border-right: none;
+  }
 }
 
 .el-main {
   background-color: #eaeaf1;
+}
+
+.toggle-button {
+  background-color: #374249;
+  font-size: 10px;
+  line-height: 24px;
+  text-align: center;
+  letter-spacing: 1px;
+  cursor: pointer;
 }
 </style>

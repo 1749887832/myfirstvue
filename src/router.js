@@ -21,8 +21,23 @@ const router = new Router({
         {
             path: '/home',
             name: 'home',
-            component: () => import('./components/home')
+            redirect: '/welcome',
+            component: () => import('./components/home'),
+            // 子路由
+            children: [
+                {
+                    path: '/welcome',
+                    name: 'welcome',
+                    component: () => import('./components/welcome'),
+                },
+                {
+                    path: '/users',
+                    name: 'user',
+                    component: () => import('./components/user/Users')
+                },
+            ]
         },
+
     ]
 })
 
@@ -36,7 +51,7 @@ router.beforeEach((to, from, next) => {
         return next()
     } else {
         // 清除token
-        const tokenStr = window.localStorage.getItem('token')
+        const tokenStr = window.sessionStorage.getItem('token')
         if (!tokenStr) {
             return next('/login')
         } else {

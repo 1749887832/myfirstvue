@@ -67,7 +67,7 @@ export default {
               console.log(res.data)
               Message.Message.success('登录成功')
               // 保存token
-              window.localStorage.setItem('token', '123123123')
+              window.sessionStorage.setItem('token', '123123123')
               return this.$router.push({path: '/home'})
             })
             .catch((res) => {
