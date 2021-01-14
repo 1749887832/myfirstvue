@@ -36,7 +36,7 @@ router.beforeEach((to, from, next) => {
         return next()
     } else {
         // 清除token
-        const tokenStr = window.sessionStorage.getItem('token')
+        const tokenStr = window.localStorage.getItem('token')
         if (!tokenStr) {
             return next('/login')
         } else {
