@@ -32,7 +32,8 @@
                 <span>{{ item.authName }}</span>
               </template>
               <!--            二级菜单-->
-              <el-menu-item :index="subItem.path" v-for="subItem in item.children" :key="subItem.id" @click="saveNavState(subItem.path)">
+              <el-menu-item :index="subItem.path" v-for="subItem in item.children" :key="subItem.id"
+                            @click="saveNavState(subItem.path)">
                 <i :class="subItem.icon"></i>
                 <span>{{ subItem.name }}</span>
               </el-menu-item>
@@ -55,6 +56,7 @@
 </template>
 
 <script>
+import Message from 'element-ui'
 
 export default {
   created() {
@@ -142,7 +144,16 @@ export default {
   methods: {
     logout() {
       window.sessionStorage.clear()
-      this.$router.push({path: '/login'})
+      this.$http.post('api/logout/')
+          .then((res) => {
+            console.log(res)
+            Message.Message.success(res.data['msg'])
+            this.$router.push({path: '/login'})
+          })
+          .catch((res) => {
+            console.log(res)
+            Message.Message.error('网络错误')
+          })
     },
     // 这是点击按钮的折叠和展开
     toggleCollapse() {
@@ -150,8 +161,8 @@ export default {
       this.isCollapse = !this.isCollapse
     },
     // 保存连接的激活状态
-    saveNavState(activePath){
-      window.sessionStorage.setItem('activePath',activePath)
+    saveNavState(activePath) {
+      window.sessionStorage.setItem('activePath', activePath)
       this.activePath = activePath
     }
   }

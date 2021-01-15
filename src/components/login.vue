@@ -61,14 +61,19 @@ export default {
       this.$refs.loginFormRef.validate(async valid => {
         console.log(valid)
         if (!valid) return;
-        this.$http.post('api/ceshi/',
+        this.$http.post('api/login/',
             this.$qs.stringify(this.LoginForm))
             .then((res) => {
               console.log(res.data)
-              Message.Message.success('登录成功')
-              // 保存token
-              window.sessionStorage.setItem('token', '123123123')
-              return this.$router.push({path: '/home'})
+              // 验证返回的是否正确
+              if (res.data['code'] === '1'){
+                Message.Message.success('登录成功')
+                // 保存token
+                window.sessionStorage.setItem('token', res.data['token'])
+                return this.$router.push({path: '/home'})
+              }else{
+                Message.Message.error(res.data['msg'])
+              }
             })
             .catch((res) => {
               console.log(res)
