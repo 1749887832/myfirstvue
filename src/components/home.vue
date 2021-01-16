@@ -78,8 +78,8 @@ export default {
           'children': [
             {
               'id': '2-1',
-              'name': '模块1',
-              'path': 'users',
+              'name': 'API环境',
+              'path': 'server',
               'icon': 'el-icon-monitor',
             },
             {

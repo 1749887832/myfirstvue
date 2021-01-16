@@ -31,9 +31,9 @@ const router = new Router({
                     component: () => import('./components/welcome'),
                 },
                 {
-                    path: '/users',
-                    name: 'user',
-                    component: () => import('./components/user/Users')
+                    path: '/server',
+                    name: 'server',
+                    component: () => import('./components/server_model/server')
                 },
             ]
         },

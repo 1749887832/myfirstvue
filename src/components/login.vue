@@ -66,7 +66,7 @@ export default {
             .then((res) => {
               console.log(res.data)
               // 验证返回的是否正确
-              if (res.data['code'] === '1'){
+              if (res.data['code'] === 1){
                 Message.Message.success('登录成功')
                 // 保存token
                 window.sessionStorage.setItem('token', res.data['token'])
@@ -75,8 +75,7 @@ export default {
                 Message.Message.error(res.data['msg'])
               }
             })
-            .catch((res) => {
-              console.log(res)
+            .catch(() => {
               Message.Message.error('网络错误')
             })
       });
