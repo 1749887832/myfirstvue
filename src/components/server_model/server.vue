@@ -41,7 +41,7 @@
             </el-tooltip>
             <!--            删除按钮-->
             <el-tooltip effect="dark" content="删除" placement="top" :enterable="false">
-              <el-button type="danger" icon="el-icon-delete" @click="serverDelete(scope.row)"></el-button>
+              <el-button type="danger" icon="el-icon-delete" @click="opendelete(scope.row)"></el-button>
             </el-tooltip>
 
           </template>
@@ -81,18 +81,6 @@
         <el-button @click="addDialogVisible = false">取 消</el-button>
         <el-button type="primary" @click="addDialogServer">添 加</el-button>
       </span>
-    </el-dialog>
-    <!--    这是删除确认框-->
-    <el-dialog
-        title="系统提示"
-        :visible.sync="deleteConfirm"
-        width="30%"
-        center>
-      <span>确定删除该API环境吗？</span>
-      <span slot="footer" class="dialog-footer">
-    <el-button @click="deleteConfirm = false">取 消</el-button>
-    <el-button type="primary" @click="RemoveServer">确 定</el-button>
-  </span>
     </el-dialog>
     <!--    这是编辑框-->
     <el-dialog
@@ -138,12 +126,8 @@ export default {
       total: 0,
       // 控制对话框的显示还是隐藏
       addDialogVisible: false,
-      // 控制确认框显示还是隐藏
-      deleteConfirm: false,
       // 控制编辑弹窗
       editDialogVisible: false,
-      // 删除的服务IP
-      deleteservername: '',
       // 这是服务的表单数据
       addServer: {
         servername: '',
@@ -246,16 +230,26 @@ export default {
     editDiaClose() {
       this.$refs.editFormRef.resetFields()
     },
-    //监听删除弹窗
-    serverDelete(deleteservername) {
-      this.deleteConfirm = true
-      this.deleteservername = deleteservername
+    // 打开删除确认框
+    opendelete(deleteservername) {
+      this.$confirm('此操作将永久删除, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        this.RemoveServer(deleteservername)
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: '已取消删除'
+        });
+      });
     },
     // 调用删除接口
-    RemoveServer() {
-      console.log(this.deleteservername)
+    RemoveServer(deleteservername) {
+      console.log(deleteservername)
       this.$http.post('api/delete-server/',
-          this.$qs.stringify(this.deleteservername))
+          this.$qs.stringify(deleteservername))
           .then((res) => {
             if (res.data['code'] === 1) {
               Message.Message.success('删除成功')
@@ -281,6 +275,7 @@ export default {
       this.editServer.server_desc = editserver.server_describe
       console.log(this.editServer)
     },
+    // 编辑请求接口
     editDialogServer() {
       this.$refs.editFormRef.validate(async res => {
         console.log(res)

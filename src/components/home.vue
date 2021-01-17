@@ -84,7 +84,7 @@ export default {
             },
             {
               'id': '2-2',
-              'name': '模块2',
+              'name': '系统变量',
               'path': 'users2',
               'icon': 'el-icon-monitor',
             },
@@ -201,6 +201,7 @@ export default {
 }
 
 .el-aside {
+  width: 100%;
   background-color: #373d41;
 
   .el-menu {
@@ -210,6 +211,8 @@ export default {
 
 .el-main {
   background-color: #eaeaf1;
+  height: 100%;
+  width: 100%;
 }
 
 .toggle-button {
