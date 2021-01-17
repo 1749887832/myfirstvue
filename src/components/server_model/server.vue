@@ -22,10 +22,10 @@
         <el-col :span="6"></el-col>
       </el-row>
       <!--      列表区域-->
-      <el-table :data="serverlist" border stripe max-height="450">
+      <el-table :data="serverlist" border stripe>
         <el-table-column label="ID" prop="id" width="100px"></el-table-column>
         <el-table-column label="服务名" prop="name"></el-table-column>
-        <el-table-column label="IP地址" prop="server_ip" width="300"></el-table-column>
+        <el-table-column label="IP地址" prop="server_ip"></el-table-column>
         <el-table-column label="描述" prop="server_describe"></el-table-column>
         <el-table-column label="状态">
           <!--          作用域插槽-->
@@ -33,7 +33,7 @@
             <el-switch v-model="scope.row.server_status" @change="serverChange(scope.row)"></el-switch>
           </template>
         </el-table-column>
-        <el-table-column label="操作" fixed="right" width="150">
+        <el-table-column label="操作" fixed="right">
           <template slot-scope="scope">
             <!--            修改按钮-->
             <el-tooltip effect="dark" content="修改" placement="top" :enterable="false">
@@ -307,7 +307,6 @@ export default {
 .el-table {
   margin-top: 15px;
   font-size: 12px;
-  width: 100%;
 }
 
 .el-pagination {
