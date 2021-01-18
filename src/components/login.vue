@@ -66,7 +66,7 @@ export default {
             .then((res) => {
               console.log(res.data)
               // 验证返回的是否正确
-              if (res.data['code'] === 1){
+              if (res.data['code'] === 0){
                 Message.Message.success('登录成功')
                 // 保存token
                 window.sessionStorage.setItem('token', res.data['token'])

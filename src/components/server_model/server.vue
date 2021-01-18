@@ -161,7 +161,7 @@ export default {
     getServerList() {
       this.$http.get('api/all-server/', {params: this.queryInfo})
           .then((res) => {
-            if (res.data['code'] === 1) {
+            if (res.data['code'] === 0) {
               this.serverlist = res.data['data']
               this.total = res.data['total']
             } else {
@@ -188,7 +188,7 @@ export default {
       this.$http.post('api/update-server/',
           this.$qs.stringify(serverinfo))
           .then((res) => {
-            if (res.data['code'] === 1) {
+            if (res.data['code'] === 0) {
               Message.Message.success(res.data['msg'])
             } else {
               serverinfo.server_status = !serverinfo.server_status
@@ -208,7 +208,7 @@ export default {
         this.$http.post('api/add-server/',
             this.$qs.stringify(this.addServer))
             .then((res) => {
-              if (res.data['code'] === 1) {
+              if (res.data['code'] === 0) {
                 this.addDialogVisible = false
                 Message.Message.success(res.data['msg'])
                 this.getServerList()
@@ -251,18 +251,15 @@ export default {
       this.$http.post('api/delete-server/',
           this.$qs.stringify(deleteservername))
           .then((res) => {
-            if (res.data['code'] === 1) {
+            if (res.data['code'] === 0) {
               Message.Message.success('删除成功')
-              this.deleteConfirm = false
               this.getServerList()
             } else {
               Message.Message.error(res.data['msg'])
-              this.deleteConfirm = false
             }
           })
           .catch(() => {
             Message.Message.error('网络错误')
-            this.deleteConfirm = false
           })
     },
     // 编辑弹窗
@@ -284,7 +281,7 @@ export default {
             this.$qs.stringify(this.editServer))
             .then((res) => {
               console.log(res)
-              if (res.data['code'] === 1) {
+              if (res.data['code'] === 0) {
                 Message.Message.success(res.data['msg'])
                 this.editDialogVisible = false
                 this.getServerList()
