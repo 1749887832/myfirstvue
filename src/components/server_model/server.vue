@@ -27,6 +27,7 @@
         <el-table-column label="服务名" prop="name"></el-table-column>
         <el-table-column label="IP地址" prop="server_ip" width="300"></el-table-column>
         <el-table-column label="描述" prop="server_describe"></el-table-column>
+        <el-table-column label="创建时间" prop="create_time"></el-table-column>
         <el-table-column label="状态">
           <!--          作用域插槽-->
           <template slot-scope="scope">
@@ -186,7 +187,7 @@ export default {
     serverChange(serverinfo) {
       console.log(serverinfo)
       this.$http.post('api/update-server/',
-          this.$qs.stringify(serverinfo))
+          serverinfo)
           .then((res) => {
             if (res.data['code'] === 0) {
               Message.Message.success(res.data['msg'])
@@ -206,7 +207,7 @@ export default {
         console.log(res)
         if (!res) return;
         this.$http.post('api/add-server/',
-            this.$qs.stringify(this.addServer))
+            this.addServer)
             .then((res) => {
               if (res.data['code'] === 0) {
                 this.addDialogVisible = false
@@ -249,7 +250,7 @@ export default {
     RemoveServer(deleteservername) {
       console.log(deleteservername)
       this.$http.post('api/delete-server/',
-          this.$qs.stringify(deleteservername))
+          deleteservername)
           .then((res) => {
             if (res.data['code'] === 0) {
               Message.Message.success('删除成功')
@@ -278,7 +279,7 @@ export default {
         console.log(res)
         if (!res) return;
         this.$http.post('api/editserver/',
-            this.$qs.stringify(this.editServer))
+            this.editServer)
             .then((res) => {
               console.log(res)
               if (res.data['code'] === 0) {
