@@ -14,6 +14,7 @@ axios.interceptors.request.use(config =>{
   console.log(config)
   // 在最后必须return 这个config
   config.headers.Authorization = window.sessionStorage.getItem('token')
+  config.headers['Content_Type'] = 'text/plain'
   return config
 })
 new Vue({

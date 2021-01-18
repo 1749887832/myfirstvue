@@ -35,6 +35,21 @@ const router = new Router({
                     name: 'server',
                     component: () => import('./components/server_model/server')
                 },
+                {
+                    path:'/case/',
+                    name:'case',
+                    component:() => import('./components/case_model/case')
+                },
+                {
+                    path:'/test/',
+                    name:'test',
+                    component:() => import('./components/test_model/test_single')
+                },
+                {
+                    path:'/variate/',
+                    name:'variate',
+                    component:() => import('./components/global_model/variate_model')
+                }
             ]
         },
 

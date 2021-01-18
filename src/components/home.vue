@@ -85,7 +85,7 @@ export default {
             {
               'id': '2-2',
               'name': '系统变量',
-              'path': 'users2',
+              'path': 'variate',
               'icon': 'el-icon-monitor',
             },
           ],
@@ -98,14 +98,14 @@ export default {
           'children': [
             {
               'id': '3-1',
-              'name': '统计1',
-              'path': 'users3',
+              'name': '测试单',
+              'path': 'test',
               'icon': 'el-icon-monitor',
             },
             {
               'id': '3-2',
-              'name': '统计2',
-              'path': 'users4',
+              'name': '用例',
+              'path': 'case',
               'icon': 'el-icon-monitor',
             },
           ],
