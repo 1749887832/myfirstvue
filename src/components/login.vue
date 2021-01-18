@@ -62,7 +62,7 @@ export default {
         console.log(valid)
         if (!valid) return;
         this.$http.post('api/login/',
-            this.$qs.stringify(this.LoginForm))
+            this.LoginForm)
             .then((res) => {
               console.log(res.data)
               // 验证返回的是否正确
