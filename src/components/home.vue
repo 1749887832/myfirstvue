@@ -85,7 +85,7 @@ export default {
             {
               'id': '2-2',
               'name': '系统变量',
-              'path': 'variate',
+              'path': 'global',
               'icon': 'el-icon-monitor',
             },
           ],

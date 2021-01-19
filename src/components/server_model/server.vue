@@ -23,11 +23,11 @@
       </el-row>
       <!--      列表区域-->
       <el-table :data="serverlist" border stripe max-height="450">
-        <el-table-column label="ID" prop="id" width="100px"></el-table-column>
-        <el-table-column label="服务名" prop="name"></el-table-column>
-        <el-table-column label="IP地址" prop="server_ip" width="300"></el-table-column>
-        <el-table-column label="描述" prop="server_describe"></el-table-column>
-        <el-table-column label="创建时间" prop="create_time"></el-table-column>
+        <el-table-column label="ID" prop="id" width="100"></el-table-column>
+        <el-table-column label="服务名" prop="name" width="150"></el-table-column>
+        <el-table-column label="IP地址" prop="server_ip" width="250"></el-table-column>
+        <el-table-column label="描述" prop="server_describe" width="250"></el-table-column>
+        <el-table-column label="创建时间" prop="create_time" width="150"></el-table-column>
         <el-table-column label="状态">
           <!--          作用域插槽-->
           <template slot-scope="scope">
