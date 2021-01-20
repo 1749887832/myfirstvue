@@ -1,20 +1,20 @@
 <template>
   <div>
-    <el-card class="box-card">
-      <el-tabs v-model="activeName" @tab-click="handleTabClick">
-        <el-tab-pane label="用户管理" name="first"></el-tab-pane>
-        <el-tab-pane label="配置管理" name="second"></el-tab-pane>
-      </el-tabs>
-      <el-row :gutter="20">
-        <el-col :span="6">
-          <el-input placeholder="请输入名" v-model="queryInfo.globalname">
-            <el-button slot="append" icon="el-icon-search" @click="getGloballist"></el-button>
+    <el-breadcrumb separator-class="el-icon-arrow-right">
+      <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
+      <el-breadcrumb-item>活动管理</el-breadcrumb-item>
+      <el-breadcrumb-item>活动列表</el-breadcrumb-item>
+      <el-breadcrumb-item>活动详情</el-breadcrumb-item>
+    </el-breadcrumb>
+    <el-card>
+      <el-row :gutter="40">
+        <el-col :span="8">
+          <el-input placeholder="请输入名">
+            <el-button slot="append" icon="el-icon-search"></el-button>
           </el-input>
         </el-col>
         <el-col :span="4">
-          <el-select v-model="chose_user" clearable placeholder="请选择"
-                     @clear="getGloballist"
-                     @change="getChosedata">
+          <el-select v-model="chose_user" clearable placeholder="请选择">
             <el-option
                 v-for="item in options"
                 :key="item.value"
@@ -33,9 +33,11 @@
               start-placeholder="开始日期"
               end-placeholder="结束日期"
               :picker-options="pickerOptions"
-              value-format="yyyy-MM-dd"
-              @change="getChoseTime">
+              value-format="yyyy-MM-dd">
           </el-date-picker>
+        </el-col>
+        <el-col :span="4">
+          <el-button type="primary">主要按钮</el-button>
         </el-col>
       </el-row>
       <el-table :data="gloaballist" border stripe max-height="450">
@@ -71,10 +73,13 @@
     </el-card>
   </div>
 </template>
+
 <script>
 export default {
-  data() {
-    return {
+  data(){
+    return{
+      total:1,
+      gloaballist:[],
       queryInfo: {
         globalname: '',
         // 选项
@@ -87,8 +92,8 @@ export default {
         page: 1,
         limit: 10
       },
-      total: 0,
-      activeName: 'first',
+      chose_user:'',
+      chose_time:'',
       options: [{
         value: '选项1',
         label: '黄金糕'
@@ -132,12 +137,9 @@ export default {
           }
         }]
       },
-      chose_user: '',
-      chose_time: '',
-      gloaballist: []
     }
   },
-  methods: {
+  methods:{
     // 监听limit改变的事件
     handleSizeChange(newLimit) {
       this.queryInfo.limit = newLimit
@@ -148,53 +150,6 @@ export default {
       this.queryInfo.page = newPage
       this.getGloballist()
     },
-    handleTabClick(tab) {
-      console.log(tab.name)
-      this.chose_user = ''
-      this.chose_time = ''
-      this.queryInfo={
-        globalname: '',
-        // 选项
-        chose_option: '',
-        // 开始时间
-        start_time: '',
-        // 结束时间
-        end_time: '',
-        // 当前的页数
-        page: 1,
-        limit: 10
-      }
-      this.getGloballist()
-    },
-    getGloballist() {
-      this.$http.post('api/show-global/'
-          , this.queryInfo)
-          .then((res) => {
-            console.log(res)
-            this.gloaballist = res.data['data']
-            this.total = res.data['total']
-          })
-          .catch((res) => {
-            console.log(res)
-          })
-    },
-    getChosedata(data) {
-      console.log(typeof data)
-      this.queryInfo.chose_option = data
-      console.log(this.queryInfo)
-      this.getGloballist()
-      console.log(data)
-    },
-    getChoseTime(time){
-      console.log(time[0])
-      this.queryInfo.start_time=time[0]
-      this.queryInfo.end_time=time[1]
-      this.getGloballist()
-    }
-  },
-
-  created() {
-    this.getGloballist()
   }
 }
 </script>

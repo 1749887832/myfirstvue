@@ -73,7 +73,7 @@
         <el-form-item label="服务IP" prop="serverip">
           <el-input v-model="addServer.serverip"></el-input>
         </el-form-item>
-        <el-form-item label="服务描述" prop="server_desc">
+        <el-form-item label="服务描述">
           <el-input type="textarea" v-model="addServer.server_desc"></el-input>
         </el-form-item>
       </el-form>

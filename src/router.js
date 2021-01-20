@@ -38,22 +38,32 @@ const router = new Router({
                 {
                     path:'/case',
                     name:'case',
-                    component:() => import('./components/case_model/case')
+                    component:() => import('./components/test_model/case')
                 },
                 {
                     path:'/test',
                     name:'test',
-                    component:() => import('./components/test_model/test_single')
+                    component:() => import('./components/test_model/test')
                 },
                 {
                     path:'/variate',
                     name:'variate',
-                    component:() => import('./components/global_model/variate_model')
+                    component:() => import('./components/test_model/variate')
                 },
                 {
                     path:'/global',
                     name:'global',
                     component:() => import('./components/server_model/global')
+                },
+                {
+                    path:'/model',
+                    name:'model',
+                    component:() => import('./components/server_model/model')
+                },
+                {
+                    path:'/headers',
+                    name:'headers',
+                    component:() => import('./components/server_model/headers')
                 }
             ]
         },
@@ -78,8 +88,6 @@ router.beforeEach((to, from, next) => {
             next()
         }
     }
-
-
 })
 
 export default router

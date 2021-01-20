@@ -1,10 +1,10 @@
 <template>
-  <h3>这是测试单模块</h3>
+  <h3>这是系统模块</h3>
 </template>
 
 <script>
 export default {
-name: "test_single"
+name: "model"
 }
 </script>
 

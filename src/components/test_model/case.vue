@@ -1,20 +1,20 @@
 <template>
   <div>
-    <el-card class="box-card">
-      <el-tabs v-model="activeName" @tab-click="handleTabClick">
-        <el-tab-pane label="用户管理" name="first"></el-tab-pane>
-        <el-tab-pane label="配置管理" name="second"></el-tab-pane>
-      </el-tabs>
-      <el-row :gutter="20">
-        <el-col :span="6">
-          <el-input placeholder="请输入名" v-model="queryInfo.globalname">
-            <el-button slot="append" icon="el-icon-search" @click="getGloballist"></el-button>
+    <el-breadcrumb separator-class="el-icon-arrow-right">
+      <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
+      <el-breadcrumb-item>活动管理</el-breadcrumb-item>
+      <el-breadcrumb-item>活动列表</el-breadcrumb-item>
+      <el-breadcrumb-item>活动详情</el-breadcrumb-item>
+    </el-breadcrumb>
+    <el-card>
+      <el-row :gutter="40">
+        <el-col :span="8">
+          <el-input placeholder="请输入名">
+            <el-button slot="append" icon="el-icon-search"></el-button>
           </el-input>
         </el-col>
         <el-col :span="4">
-          <el-select v-model="chose_user" clearable placeholder="请选择"
-                     @clear="getGloballist"
-                     @change="getChosedata">
+          <el-select v-model="chose_user" clearable placeholder="请选择">
             <el-option
                 v-for="item in options"
                 :key="item.value"
@@ -33,9 +33,11 @@
               start-placeholder="开始日期"
               end-placeholder="结束日期"
               :picker-options="pickerOptions"
-              value-format="yyyy-MM-dd"
-              @change="getChoseTime">
+              value-format="yyyy-MM-dd">
           </el-date-picker>
+        </el-col>
+        <el-col :span="4">
+          <el-button type="primary" @click="addCaseDilog=true">创建用例</el-button>
         </el-col>
       </el-row>
       <el-table :data="gloaballist" border stripe max-height="450">
@@ -69,12 +71,55 @@
           :total="total">
       </el-pagination>
     </el-card>
+    <el-dialog
+        title="提示"
+        :visible.sync="addCaseDilog"
+        width="50%"
+        @close="addCaseClose">
+      <el-form :model="addCase" :rules="addCaseRules" ref="addCaseRef" label-width="100px">
+        <el-form-item label="服务名" prop="casename">
+          <el-input v-model="addCase.casename"></el-input>
+        </el-form-item>
+        <el-form-item label="所属模块" prop="casemodel">
+          <el-cascader v-model="addCase.casemodel" :options="three_options" clearable @change="getThreeValue" size="200"></el-cascader>
+        </el-form-item>
+        <el-form-item label="服务描述">
+          <el-input type="textarea" v-model="addCase.caseesc"></el-input>
+        </el-form-item>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+    <el-button @click="addCaseDilog = false">取 消</el-button>
+    <el-button type="primary" @click="addCaseFunc">确 定</el-button>
+  </span>
+    </el-dialog>
   </div>
 </template>
+
 <script>
 export default {
   data() {
     return {
+      // 这是添加用户的表单
+      addCase: {
+        casename: '',
+        casemodel: '',
+        caseesc: '',
+      },
+      three_options: [{
+        value: '1',
+        label: '极运营',
+        children: [{
+          value: '1',
+          label: '学生报名',
+          children: [{
+            value: '1',
+            label: '学生下单流程',
+          }]
+        }]
+      }],
+      addCaseDilog: false,
+      total: 1,
+      gloaballist: [],
       queryInfo: {
         globalname: '',
         // 选项
@@ -87,8 +132,8 @@ export default {
         page: 1,
         limit: 10
       },
-      total: 0,
-      activeName: 'first',
+      chose_user: '',
+      chose_time: '',
       options: [{
         value: '选项1',
         label: '黄金糕'
@@ -105,6 +150,16 @@ export default {
         value: '选项5',
         label: '北京烤鸭'
       }],
+      // 这是验证表单规则
+      addCaseRules: {
+        casename: [
+          {required: true, message: '请填写用例标题', trigger: 'blur'},
+          {min: 3, max: 10, message: '用例标题在3-10个字符直减', trigger: 'blur'}
+        ],
+        casemodel: [
+          {required: true, message: '所属模块不能为空', trigger: 'blur'}
+        ]
+      },
       pickerOptions: {
         shortcuts: [{
           text: '最近一周',
@@ -132,9 +187,6 @@ export default {
           }
         }]
       },
-      chose_user: '',
-      chose_time: '',
-      gloaballist: []
     }
   },
   methods: {
@@ -148,53 +200,28 @@ export default {
       this.queryInfo.page = newPage
       this.getGloballist()
     },
-    handleTabClick(tab) {
-      console.log(tab.name)
-      this.chose_user = ''
-      this.chose_time = ''
-      this.queryInfo={
-        globalname: '',
-        // 选项
-        chose_option: '',
-        // 开始时间
-        start_time: '',
-        // 结束时间
-        end_time: '',
-        // 当前的页数
-        page: 1,
-        limit: 10
-      }
-      this.getGloballist()
+    addCaseDiaClose() {
     },
-    getGloballist() {
-      this.$http.post('api/show-global/'
-          , this.queryInfo)
-          .then((res) => {
-            console.log(res)
-            this.gloaballist = res.data['data']
-            this.total = res.data['total']
-          })
-          .catch((res) => {
-            console.log(res)
-          })
-    },
-    getChosedata(data) {
-      console.log(typeof data)
-      this.queryInfo.chose_option = data
-      console.log(this.queryInfo)
-      this.getGloballist()
+    getThreeValue(data) {
       console.log(data)
     },
-    getChoseTime(time){
-      console.log(time[0])
-      this.queryInfo.start_time=time[0]
-      this.queryInfo.end_time=time[1]
-      this.getGloballist()
+    addCaseClose() {
+      this.$refs.addCaseRef.resetFields()
+    },
+    addCaseFunc() {
+      this.$refs.addCaseRef.validate(async res => {
+        console.log(res)
+        if (!res) return;
+        this.$http.post('api/add-case/',
+        this.addCase)
+        .then((res)=>{
+          console.log(res)
+        })
+        .catch((res)=>{
+          console.log(res)
+        })
+      })
     }
-  },
-
-  created() {
-    this.getGloballist()
   }
 }
 </script>
@@ -204,5 +231,14 @@ export default {
   margin-top: 15px;
   font-size: 12px;
   width: 100%;
+}
+
+.el-card {
+  width: 100%;
+  overflow: auto;
+}
+
+.el-cascader {
+  width: 60%;
 }
 </style>

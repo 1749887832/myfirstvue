@@ -77,16 +77,28 @@ export default {
           'authName': '模块',
           'children': [
             {
-              'id': '2-1',
-              'name': 'API环境',
+              'id':'2-1',
+              'name':'系统模块',
+              'path':'model',
+              'icon':'el-icon-monitor',
+            },
+            {
+              'id': '2-2',
+              'name': '系统环境',
               'path': 'server',
               'icon': 'el-icon-monitor',
             },
             {
-              'id': '2-2',
+              'id': '2-3',
               'name': '系统变量',
               'path': 'global',
               'icon': 'el-icon-monitor',
+            },
+            {
+              'id':'2-4',
+              'name':'请求头',
+              'path':'headers',
+              'icon':'el-icon-monitor',
             },
           ],
           'id': 2,
