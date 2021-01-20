@@ -40,23 +40,25 @@
           <el-button type="primary" @click="addCaseDilog=true">创建用例</el-button>
         </el-col>
       </el-row>
-      <el-table :data="gloaballist" border stripe max-height="450">
-        <el-table-column label="ID" prop="id" width="100"></el-table-column>
-        <el-table-column label="变量名" prop="globals_name" width="150"></el-table-column>
-        <el-table-column label="使用名" prop="use_name" width="150"></el-table-column>
-        <el-table-column label="类型" prop="globals_type" width="100"></el-table-column>
-        <el-table-column label="状态" prop="use_type" width="100"></el-table-column>
-        <el-table-column label="参数变量" prop="cite_arguments" width="150"></el-table-column>
-        <el-table-column label="创建时间" prop="create_time" width="150"></el-table-column>
-        <el-table-column label="描述" prop="content" width="200"></el-table-column>
-        <el-table-column label="创建人" prop="create_user" width="100"></el-table-column>
-        <el-table-column label="操作" fixed="right" width="150">
+      <el-table :data="caseList" border stripe max-height="450">
+        <el-table-column label="ID" prop="id" width="100" fixed="left"></el-table-column>
+        <el-table-column label="用例标题" prop="test_name" width="250"></el-table-column>
+        <el-table-column label="用例描述" prop="test_content" width="350"></el-table-column>
+        <el-table-column label="创建人" prop="create_user" width="150"></el-table-column>
+        <el-table-column label="创建时间" prop="create_time" width="200"></el-table-column>
+        <el-table-column label="操作" fixed="right" width="230" align="center">
           <template>
             <el-tooltip effect="dark" content="修改" placement="top" :enterable="false">
-              <el-button type="primary" icon="el-icon-edit"></el-button>
+              <el-button type="primary" icon="el-icon-edit" size="mini"></el-button>
+            </el-tooltip>
+            <el-tooltip effect="dark" content="调试" placement="top" :enterable="false">
+              <el-button type="success" icon="el-icon-notebook-1" size="mini"></el-button>
+            </el-tooltip>
+            <el-tooltip effect="dark" content="添加" placement="top" :enterable="false">
+              <el-button type="warning" icon="el-icon-reading" size="mini"></el-button>
             </el-tooltip>
             <el-tooltip effect="dark" content="删除" placement="top" :enterable="false">
-              <el-button type="danger" icon="el-icon-delete"></el-button>
+              <el-button type="danger" icon="el-icon-delete" size="mini"></el-button>
             </el-tooltip>
           </template>
         </el-table-column>
@@ -77,13 +79,14 @@
         width="50%"
         @close="addCaseClose">
       <el-form :model="addCase" :rules="addCaseRules" ref="addCaseRef" label-width="100px">
-        <el-form-item label="服务名" prop="casename">
+        <el-form-item label="用例标题" prop="casename">
           <el-input v-model="addCase.casename"></el-input>
         </el-form-item>
         <el-form-item label="所属模块" prop="casemodel">
-          <el-cascader v-model="addCase.casemodel" :options="three_options" clearable @change="getThreeValue" size="200"></el-cascader>
+          <el-cascader v-model="addCase.casemodel" :options="three_options" clearable @change="getThreeValue"
+                       size="200"></el-cascader>
         </el-form-item>
-        <el-form-item label="服务描述">
+        <el-form-item label="用例描述">
           <el-input type="textarea" v-model="addCase.caseesc"></el-input>
         </el-form-item>
       </el-form>
@@ -96,9 +99,13 @@
 </template>
 
 <script>
+import Message from 'element-ui'
+
 export default {
   data() {
     return {
+      // 接收返回的表格数据
+      caseList: [],
       // 这是添加用户的表单
       addCase: {
         casename: '',
@@ -117,11 +124,11 @@ export default {
           }]
         }]
       }],
+      // 控制添加窗口的显示与不显示
       addCaseDilog: false,
-      total: 1,
-      gloaballist: [],
+      total: 0,
       queryInfo: {
-        globalname: '',
+        casename: '',
         // 选项
         chose_option: '',
         // 开始时间
@@ -130,7 +137,7 @@ export default {
         end_time: '',
         // 当前的页数
         page: 1,
-        limit: 10
+        limit: 10,
       },
       chose_user: '',
       chose_time: '',
@@ -189,18 +196,20 @@ export default {
       },
     }
   },
+  created() {
+    this.getCaseList()
+    console.log(this.caseList)
+  },
   methods: {
     // 监听limit改变的事件
     handleSizeChange(newLimit) {
       this.queryInfo.limit = newLimit
-      this.getGloballist()
+      this.getCaseList()
     },
     // 监听页码值改变的事件
     handleCurrentChange(newPage) {
       this.queryInfo.page = newPage
-      this.getGloballist()
-    },
-    addCaseDiaClose() {
+      this.getCaseList()
     },
     getThreeValue(data) {
       console.log(data)
@@ -213,17 +222,37 @@ export default {
         console.log(res)
         if (!res) return;
         this.$http.post('api/add-case/',
-        this.addCase)
-        .then((res)=>{
-          console.log(res)
-        })
-        .catch((res)=>{
-          console.log(res)
-        })
+            this.addCase)
+            .then((res) => {
+              if (res.data['code'] === 0) {
+                this.addCaseDilog = false
+                Message.Message.success(res.data['msg'])
+              } else {
+                Message.Message.error('添加失败')
+              }
+            })
+            .catch(() => {
+              Message.Message.error('网络错误')
+            })
       })
-    }
+    },
+    getCaseList() {
+      this.$http.post('api/show-case/')
+          .then((res) => {
+            if (res.data['code'] === 0) {
+              this.caseList = res.data['data']
+              this.total = res.data.total
+            } else {
+              Message.Message.error('网络错误')
+            }
+          })
+          .catch(() => {
+            Message.Message.error('网络错误')
+          })
+    },
   }
 }
+
 </script>
 
 <style lang="less" scoped>

@@ -156,8 +156,7 @@ export default {
   },
   created() {
     this.getServerList()
-  }
-  ,
+  },
   methods: {
     getServerList() {
       this.$http.get('api/all-server/', {params: this.queryInfo})
