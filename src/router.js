@@ -64,6 +64,11 @@ const router = new Router({
                     path:'/headers',
                     name:'headers',
                     component:() => import('./components/server_model/headers')
+                },
+                {
+                    path:'/step',
+                    name:'step',
+                    component:()=>import('./components/test_model/step')
                 }
             ]
         },

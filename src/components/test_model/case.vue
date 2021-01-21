@@ -43,7 +43,7 @@
       <el-table :data="caseList" border stripe max-height="450">
         <el-table-column label="ID" prop="id" width="100" fixed="left"></el-table-column>
         <el-table-column label="用例标题" prop="test_name" width="250"></el-table-column>
-        <el-table-column label="用例描述" prop="test_content" width="350"></el-table-column>
+        <el-table-column label="用例描述" prop="test_content" width="350" :show-overflow-tooltip="true"></el-table-column>
         <el-table-column label="创建人" prop="create_user" width="150"></el-table-column>
         <el-table-column label="创建时间" prop="create_time" width="200"></el-table-column>
         <el-table-column label="操作" fixed="right" width="230" align="center">
@@ -55,7 +55,7 @@
               <el-button type="success" icon="el-icon-notebook-1" size="mini"></el-button>
             </el-tooltip>
             <el-tooltip effect="dark" content="添加" placement="top" :enterable="false">
-              <el-button type="warning" icon="el-icon-reading" size="mini"></el-button>
+              <el-button type="warning" icon="el-icon-reading" size="mini" @click="()=>this.$router.push({path: '/step'})"></el-button>
             </el-tooltip>
             <el-tooltip effect="dark" content="删除" placement="top" :enterable="false">
               <el-button type="danger" icon="el-icon-delete" size="mini"></el-button>
@@ -91,9 +91,9 @@
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
-    <el-button @click="addCaseDilog = false">取 消</el-button>
-    <el-button type="primary" @click="addCaseFunc">确 定</el-button>
-  </span>
+        <el-button @click="addCaseDilog = false">取 消</el-button>
+        <el-button type="primary" @click="addCaseFunc">确 定</el-button>
+      </span>
     </el-dialog>
   </div>
 </template>
