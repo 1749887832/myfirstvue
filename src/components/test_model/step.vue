@@ -29,7 +29,7 @@
         @close="addStepClose">
       <el-form label-width="100px" :inline="true" ref="addStepRef" :rules="addStepRules" :model="stepFrom">
         <el-form-item label="url:" style="width: 500px" prop="step_name">
-          <el-input clearable placeholder="请输入请求接口" v-model="stepFrom.step_name" style="width: 400px"></el-input>
+          <el-input clearable placeholder="请输入请求接口" v-model="stepFrom.step_url" style="width: 400px"></el-input>
         </el-form-item>
         <el-form-item label="请求类型:" style="width: 400px" prop="step_type">
           <el-select v-model="stepFrom.step_type" placeholder="请求类型">
@@ -102,7 +102,7 @@ export default {
       showglobals: false,
       // 表单数据
       stepFrom: {
-        step_name: '',
+        step_url: '',
         step_type: '',
         step_content: '',
         argument: '',
@@ -137,7 +137,7 @@ export default {
         label: '北京烤鸭'
       }],
       addStepRules: {
-        step_name: [
+        step_url: [
           {required: true, message: '请填写步骤名', trigger: 'blur'},
           {min: 3, max: 10, message: '名称在3-10个字符之间', trigger: 'blur'}
         ],
