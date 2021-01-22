@@ -70,27 +70,34 @@
             <el-input v-model="stepFrom.global_name" placeholder="请输入使用参数的变量名"></el-input>
           </el-form-item>
           <el-form-item label="参数名">
-              <el-input v-model="stepFrom.argument" placeholder="参数名必须为后端返回"></el-input>
+            <el-input v-model="stepFrom.argument" placeholder="参数名必须为后端返回"></el-input>
           </el-form-item>
         </div>
         <el-form-item label="步骤描述" style="width: 900px">
           <el-input type="textarea" :rows="5" style="width: 800px" v-model="stepFrom.step_data"></el-input>
         </el-form-item>
       </el-form>
-      <el-button type="primary">调试</el-button>
+      <el-button type="primary" @click="Debugstep">调试</el-button>
+      <json-viewer :data="jsonData" :expand-depth=1 :value="jsonData"></json-viewer>
       <span slot="footer" class="dialog-footer">
-    <el-button @click="dialogVisible = false">取 消</el-button>
-    <el-button type="primary" @click="addStep">确 定</el-button>
-  </span>
+        <el-button @click="dialogVisible = false">取 消</el-button>
+        <el-button type="primary" @click="addStep">确 定</el-button>
+      </span>
     </el-dialog>
   </div>
 </template>
 
 <script>
 import Message from 'element-ui'
+
 export default {
   data() {
     return {
+      // 调试的json
+      jsonData: {
+        'username': 'liu',
+        'password': '123'
+      },
       // 控制显示获取参数
       showglobals: false,
       // 表单数据
@@ -98,15 +105,15 @@ export default {
         step_name: '',
         step_type: '',
         step_content: '',
-        argument:'',
-        global_name:'',
+        argument: '',
+        global_name: '',
         assert_name: [{
           value: '',
-          name:'',
-          type:'',
+          name: '',
+          type: '',
         }],
         delivery: false,
-        step_data:'',
+        step_data: '',
       },
       // 接受后端的返回参数
       steplist: [],
@@ -151,13 +158,13 @@ export default {
       let index = this.stepFrom.assert_name.indexOf(item)
       if (long > 1) {
         this.stepFrom.assert_name.splice(index, 1)
-      }else{
+      } else {
         Message.Message.info('至少要有一个断言参数')
       }
     },
     showGlobal(nowstatus) {
       this.showglobals = nowstatus === true;
-      if (!this.delivery){
+      if (!this.delivery) {
         this.stepFrom.global_name = ''
         this.stepFrom.argument = ''
       }
@@ -168,13 +175,28 @@ export default {
         console.log(this.stepFrom)
         if (!res) return;
         this.$http.post('api/add-step/',
-        this.stepFrom)
-        .then((res)=>{
-          console.log(res)
-        })
-        .catch((res)=>{
-          console.log(res)
-        })
+            this.stepFrom)
+            .then((res) => {
+              console.log(res)
+            })
+            .catch((res) => {
+              console.log(res)
+            })
+      })
+    },
+    Debugstep() {
+      this.$refs.addStepRef.validate(async res => {
+        console.log(res)
+        console.log(this.stepFrom)
+        if (!res) return;
+        this.$http.post('api/debug-step/',
+            this.stepFrom)
+            .then((res) => {
+              console.log(res)
+            })
+            .catch((res) => {
+              console.log(res)
+            })
       })
     },
     addStepClose() {
