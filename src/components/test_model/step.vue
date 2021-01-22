@@ -26,72 +26,93 @@
         title="添加步骤"
         :visible.sync="dialogVisible"
         width="1000px"
-      :inline="true">
-      <el-form label-width="100px" :inline="true">
-        <el-form-item label="url:" style="width: 500px">
+        @close="addStepClose">
+      <el-form label-width="100px" :inline="true" ref="addStepRef" :rules="addStepRules" :model="stepFrom">
+        <el-form-item label="url:" style="width: 500px" prop="step_name">
           <el-input clearable placeholder="请输入请求接口" v-model="stepFrom.step_name" style="width: 400px"></el-input>
         </el-form-item>
-        <el-form-item label="请求类型:" style="width: 400px">
+        <el-form-item label="请求类型:" style="width: 400px" prop="step_type">
           <el-select v-model="stepFrom.step_type" placeholder="请求类型">
             <el-option label="POST" value="POST"></el-option>
             <el-option label="GET" value="GET"></el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="body" style="width: 900px">
-          <el-input type="textarea" :rows="20" autosize style="width: 800px"></el-input>
+          <el-input type="textarea" :rows="5" style="width: 800px" v-model="stepFrom.step_content"></el-input>
         </el-form-item>
         <el-form-item
-            style="padding-left: 20px"
-            v-for="(domain, index) in dynamicValidateForm.domains"
+            v-for="(domain, index) in stepFrom.assert_name"
             :label="'断言' + index"
             :key="domain.key"
-            :prop="'domains.' + index + '.value'"
+            :prop="'assert_name.' + index + '.value'"
+            :rules="{
+      required: true, message: '断言不能为空', trigger: 'blur'
+    }"
         >
-          <el-input placeholder="断言参数" style="width: 150px"></el-input>
-          <el-select v-model="domain.value" placeholder="类型">
+          <el-input placeholder="断言参数" style="width: 150px;margin-right: 20px" v-model="domain.name"></el-input>
+          <el-select v-model="domain.type" placeholder="类型" style="width: 150px;margin-right: 20px">
             <el-option
-                style="width: 150px"
                 v-for="item in chose_options"
                 :key="item.value"
                 :label="item.label"
                 :value="item.value"></el-option>
           </el-select>
-          <el-input v-model="domain.value" style="width: 150px"></el-input>
-          <el-button @click.prevent="removeDomain(domain)">删除</el-button>
+          <el-input v-model="domain.value" style="width: 150px;margin-right:20px" placeholder="断言期望"></el-input>
+          <el-button icon="el-icon-minus" @click.prevent="removeDomain(domain)" type="danger"
+                     :circle="true"></el-button>
         </el-form-item>
-        <el-button @click="addDomain">新增断言</el-button>
-        <el-form-item label="即时配送" prop="delivery">
-          <el-switch v-model="dynamicValidateForm.delivery"></el-switch>
+        <el-button icon="el-icon-plus" @click="addDomain" :circle="true" type="primary"></el-button>
+        <el-form-item label="获取参数" style="width: 100%">
+          <el-switch v-model="stepFrom.delivery" @change="showGlobal"></el-switch>
         </el-form-item>
-        <el-form-item label="审批人">
-          <el-input v-model="formInline.user" placeholder="审批人"></el-input>
-        </el-form-item>
-        <el-form-item label="活动区域">
-          <el-select v-model="formInline.region" placeholder="活动区域">
-            <el-option label="区域一" value="shanghai"></el-option>
-            <el-option label="区域二" value="beijing"></el-option>
-          </el-select>
-        </el-form-item>
-        <el-form-item label="步骤描述">
-          <el-input type="textarea" :rows="5" autosize></el-input>
+        <div v-show="showglobals">
+          <el-form-item label="变量名">
+            <el-input v-model="stepFrom.global_name" placeholder="请输入使用参数的变量名"></el-input>
+          </el-form-item>
+          <el-form-item label="参数名">
+              <el-input v-model="stepFrom.argument" placeholder="参数名必须为后端返回"></el-input>
+          </el-form-item>
+        </div>
+        <el-form-item label="步骤描述" style="width: 900px">
+          <el-input type="textarea" :rows="5" style="width: 800px" v-model="stepFrom.step_data"></el-input>
         </el-form-item>
       </el-form>
+      <el-button type="primary">调试</el-button>
       <span slot="footer" class="dialog-footer">
     <el-button @click="dialogVisible = false">取 消</el-button>
-    <el-button type="primary" @click="dialogVisible = false">确 定</el-button>
+    <el-button type="primary" @click="addStep">确 定</el-button>
   </span>
     </el-dialog>
   </div>
 </template>
 
 <script>
+import Message from 'element-ui'
 export default {
   data() {
     return {
-      stepFrom:{
-        step_name:'',
-        step_type:'',
+      // 控制显示获取参数
+      showglobals: false,
+      // 表单数据
+      stepFrom: {
+        step_name: '',
+        step_type: '',
+        step_content: '',
+        argument:'',
+        global_name:'',
+        assert_name: [{
+          value: '',
+          name:'',
+          type:'',
+        }],
+        delivery: false,
+        step_data:'',
       },
+      // 接受后端的返回参数
+      steplist: [],
+      // 控制弹窗的显示还是不显示
+      dialogVisible: false,
+      // 下拉选择框
       chose_options: [{
         value: '选项1',
         label: '黄金糕'
@@ -108,34 +129,57 @@ export default {
         value: '选项5',
         label: '北京烤鸭'
       }],
-      formInline: {
-        user: '',
-        region: ''
-      },
-      steplist: [],
-      dialogVisible: false,
-      dynamicValidateForm: {
-        domains: [{
-          value: ''
-        }],
-        email: '',
-        delivery:false,
-      },
+      addStepRules: {
+        step_name: [
+          {required: true, message: '请填写步骤名', trigger: 'blur'},
+          {min: 3, max: 10, message: '名称在3-10个字符之间', trigger: 'blur'}
+        ],
+        step_type: [
+          {required: true, message: '请选择请求类型', trigger: 'blur'}
+        ]
+      }
     }
   },
-  methods:{
+  methods: {
     addDomain() {
-      this.dynamicValidateForm.domains.push({
+      this.stepFrom.assert_name.push({
         value: '',
-        key: Date.now()
       })
     },
     removeDomain(item) {
-      var index = this.dynamicValidateForm.domains.indexOf(item)
-      if (index !== -1) {
-        this.dynamicValidateForm.domains.splice(index, 1)
+      let long = this.stepFrom.assert_name.length
+      let index = this.stepFrom.assert_name.indexOf(item)
+      if (long > 1) {
+        this.stepFrom.assert_name.splice(index, 1)
+      }else{
+        Message.Message.info('至少要有一个断言参数')
       }
     },
+    showGlobal(nowstatus) {
+      this.showglobals = nowstatus === true;
+      if (!this.delivery){
+        this.stepFrom.global_name = ''
+        this.stepFrom.argument = ''
+      }
+    },
+    addStep() {
+      this.$refs.addStepRef.validate(async res => {
+        console.log(res)
+        console.log(this.stepFrom)
+        if (!res) return;
+        this.$http.post('api/add-step/',
+        this.stepFrom)
+        .then((res)=>{
+          console.log(res)
+        })
+        .catch((res)=>{
+          console.log(res)
+        })
+      })
+    },
+    addStepClose() {
+      this.$refs.addStepRef.resetFields()
+    }
   }
 }
 </script>
@@ -145,6 +189,7 @@ export default {
   margin-top: 20px;
   font-size: 12px;
 }
+
 //.el-form-item__content{
 //  flex-wrap: wrap;
 //}

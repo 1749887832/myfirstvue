@@ -87,7 +87,7 @@
                        size="200"></el-cascader>
         </el-form-item>
         <el-form-item label="用例描述">
-          <el-input type="textarea" v-model="addCase.caseesc"></el-input>
+          <el-input type="textarea" v-model="addCase.caseesc" :rows="5"></el-input>
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
