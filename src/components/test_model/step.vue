@@ -45,9 +45,7 @@
             :label="'断言' + index"
             :key="domain.key"
             :prop="'assert_name.' + index + '.value'"
-            :rules="{
-      required: true, message: '断言不能为空', trigger: 'blur'
-    }"
+            :rules="{required: true, message: '断言不能为空', trigger: 'blur'}"
         >
           <el-input placeholder="断言参数" style="width: 150px;margin-right: 20px" v-model="domain.name"></el-input>
           <el-select v-model="domain.type" placeholder="类型" style="width: 150px;margin-right: 20px">
@@ -58,6 +56,7 @@
                 :value="item.value"></el-option>
           </el-select>
           <el-input v-model="domain.value" style="width: 150px;margin-right:20px" placeholder="断言期望"></el-input>
+          <span :model="assert_result[index].value"></span>
           <el-button icon="el-icon-minus" @click.prevent="removeDomain(domain)" type="danger"
                      :circle="true"></el-button>
         </el-form-item>
@@ -94,10 +93,12 @@ export default {
   data() {
     return {
       // 调试的json
-      jsonData: {
-        'username': 'liu',
-        'password': '123'
-      },
+      jsonData: {},
+      // 获取断言结果
+      assert_result: [{
+        'code':'',
+        'value':'',
+      }],
       // 控制显示获取参数
       showglobals: false,
       // 表单数据
@@ -121,20 +122,29 @@ export default {
       dialogVisible: false,
       // 下拉选择框
       chose_options: [{
-        value: '选项1',
-        label: '黄金糕'
+        value: 'equal',
+        label: '等于(==)'
       }, {
-        value: '选项2',
-        label: '双皮奶'
+        value: 'not_equal',
+        label: '不等于(!=)'
       }, {
-        value: '选项3',
-        label: '蚵仔煎'
+        value: 'less',
+        label: '小于(<)'
       }, {
-        value: '选项4',
-        label: '龙须面'
+        value: 'greater',
+        label: '大于(>)'
       }, {
-        value: '选项5',
-        label: '北京烤鸭'
+        value: 'less_equal',
+        label: '小于等于(<=)'
+      }, {
+        value: 'greater_equal',
+        label: '大于等于(>=)'
+      }, {
+        value: 'in_to',
+        label: '包含(in)'
+      }, {
+        value: 'not_in',
+        label: '不包含(not in)'
       }],
       addStepRules: {
         step_url: [
@@ -151,6 +161,8 @@ export default {
     addDomain() {
       this.stepFrom.assert_name.push({
         value: '',
+        name: '',
+        type: ''
       })
     },
     removeDomain(item) {
@@ -192,9 +204,17 @@ export default {
         this.$http.post('api/debug-step/',
             this.stepFrom)
             .then((res) => {
+              if (res.data['code'] === 0) {
+                this.jsonData = res.data['data'][0]
+                this.assert_result = res.data['data'][1]
+                console.log(this.assert_result)
+              } else {
+                Message.Message.error('网络错误')
+              }
               console.log(res)
             })
             .catch((res) => {
+              Message.Message.error('网络错误')
               console.log(res)
             })
       })
