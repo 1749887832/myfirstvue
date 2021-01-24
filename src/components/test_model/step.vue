@@ -56,7 +56,14 @@
                 :value="item.value"></el-option>
           </el-select>
           <el-input v-model="domain.value" style="width: 150px;margin-right:20px" placeholder="断言期望"></el-input>
-          <span :model="assert_result[index].value"></span>
+          <template>
+            <span v-if="assert_result[index].code === 0" style="color: #67C23A">
+              {{assert_result[index].assert_result}}
+            </span>
+            <span v-else style="color: #f56c6c">
+              {{assert_result[index].assert_result}}
+            </span>
+          </template>
           <el-button icon="el-icon-minus" @click.prevent="removeDomain(domain)" type="danger"
                      :circle="true"></el-button>
         </el-form-item>
@@ -97,7 +104,7 @@ export default {
       // 获取断言结果
       assert_result: [{
         'code':'',
-        'value':'',
+        'assert_result':'',
       }],
       // 控制显示获取参数
       showglobals: false,
@@ -159,6 +166,10 @@ export default {
   },
   methods: {
     addDomain() {
+      this.assert_result.push({
+        'code':'',
+        'assert_result':'',
+      })
       this.stepFrom.assert_name.push({
         value: '',
         name: '',
@@ -170,6 +181,7 @@ export default {
       let index = this.stepFrom.assert_name.indexOf(item)
       if (long > 1) {
         this.stepFrom.assert_name.splice(index, 1)
+        this.assert_result.splice(index,1)
       } else {
         Message.Message.info('至少要有一个断言参数')
       }
@@ -201,6 +213,12 @@ export default {
         console.log(res)
         console.log(this.stepFrom)
         if (!res) return;
+        const loading = this.$loading({
+          lock: true,
+          text: 'Loading',
+          spinner: 'el-icon-loading',
+          background: 'rgba(0, 0, 0, 0.7)'
+        })
         this.$http.post('api/debug-step/',
             this.stepFrom)
             .then((res) => {
@@ -212,8 +230,10 @@ export default {
                 Message.Message.error('网络错误')
               }
               console.log(res)
-            })
+              loading.close()
+            },)
             .catch((res) => {
+              loading.close()
               Message.Message.error('网络错误')
               console.log(res)
             })
