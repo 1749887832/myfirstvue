@@ -36,39 +36,47 @@ const router = new Router({
                     component: () => import('./components/server_model/server')
                 },
                 {
-                    path:'/case',
-                    name:'case',
-                    component:() => import('./components/test_model/case')
+                    path: '/test',
+                    name: 'test',
+                    component: () => import('./components/test_model/test')
                 },
                 {
-                    path:'/test',
-                    name:'test',
-                    component:() => import('./components/test_model/test')
+                    path: '/variate',
+                    name: 'variate',
+                    component: () => import('./components/test_model/variate')
                 },
                 {
-                    path:'/variate',
-                    name:'variate',
-                    component:() => import('./components/test_model/variate')
+                    path: '/global',
+                    name: 'global',
+                    component: () => import('./components/server_model/global')
                 },
                 {
-                    path:'/global',
-                    name:'global',
-                    component:() => import('./components/server_model/global')
+                    path: '/model',
+                    name: 'model',
+                    component: () => import('./components/server_model/model')
                 },
                 {
-                    path:'/model',
-                    name:'model',
-                    component:() => import('./components/server_model/model')
+                    path: '/headers',
+                    name: 'headers',
+                    component: () => import('./components/server_model/headers')
                 },
                 {
-                    path:'/headers',
-                    name:'headers',
-                    component:() => import('./components/server_model/headers')
-                },
-                {
-                    path:'/step',
-                    name:'step',
-                    component:()=>import('./components/test_model/step')
+                    path: '/case_nva',
+                    name: 'case_nva',
+                    redirect: '/case',
+                    component: () => import('./components/test_model/case_nva'),
+                    children: [
+                        {
+                            path: '/case',
+                            name: 'case',
+                            component: () => import('./components/test_model/test_content/case')
+                        },
+                        {
+                            path: '/step',
+                            name: 'step',
+                            component: () => import('./components/test_model/test_content/step')
+                        },
+                    ]
                 }
             ]
         },

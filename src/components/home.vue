@@ -117,7 +117,7 @@ export default {
             {
               'id': '3-2',
               'name': '用例',
-              'path': 'case',
+              'path': 'case_nva',
               'icon': 'el-icon-monitor',
             },
           ],

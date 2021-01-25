@@ -1,11 +1,5 @@
 <template>
   <div>
-    <el-breadcrumb separator-class="el-icon-arrow-right">
-      <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
-      <el-breadcrumb-item>活动管理</el-breadcrumb-item>
-      <el-breadcrumb-item>活动列表</el-breadcrumb-item>
-      <el-breadcrumb-item>活动详情</el-breadcrumb-item>
-    </el-breadcrumb>
     <el-card>
       <el-row :gutter="40">
         <el-col :span="8">
@@ -43,11 +37,11 @@
       <el-table :data="caseList" border stripe max-height="450">
         <el-table-column label="ID" prop="id" width="100" fixed="left"></el-table-column>
         <el-table-column label="用例标题" prop="test_name" width="250"></el-table-column>
-        <el-table-column label="用例描述" prop="test_content" width="350" :show-overflow-tooltip="true"></el-table-column>
+        <el-table-column label="用例描述" prop="test_content" width="550" :show-overflow-tooltip="true"></el-table-column>
         <el-table-column label="创建人" prop="create_user" width="150"></el-table-column>
         <el-table-column label="创建时间" prop="create_time" width="200"></el-table-column>
         <el-table-column label="操作" fixed="right" width="230" align="center">
-          <template>
+          <template slot-scope="scope">
             <el-tooltip effect="dark" content="修改" placement="top" :enterable="false">
               <el-button type="primary" icon="el-icon-edit" size="mini"></el-button>
             </el-tooltip>
@@ -55,7 +49,7 @@
               <el-button type="success" icon="el-icon-notebook-1" size="mini"></el-button>
             </el-tooltip>
             <el-tooltip effect="dark" content="添加" placement="top" :enterable="false">
-              <el-button type="warning" icon="el-icon-reading" size="mini" @click="()=>this.$router.push({path: '/step'})"></el-button>
+              <el-button type="warning" icon="el-icon-reading" size="mini" @click="to_step(scope.row.id)"></el-button>
             </el-tooltip>
             <el-tooltip effect="dark" content="删除" placement="top" :enterable="false">
               <el-button type="danger" icon="el-icon-delete" size="mini"></el-button>
@@ -201,6 +195,16 @@ export default {
     console.log(this.caseList)
   },
   methods: {
+    // 跳转到用例的步骤页面
+    to_step(case_id) {
+      console.log(case_id)
+      this.$router.push({
+        name: 'step',
+        params: {
+          'id': case_id
+        }
+      })
+    },
     // 监听limit改变的事件
     handleSizeChange(newLimit) {
       this.queryInfo.limit = newLimit

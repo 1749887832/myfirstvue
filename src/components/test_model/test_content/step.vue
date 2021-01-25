@@ -7,7 +7,12 @@
       </el-row>
       <!--列表区域-->
       <el-table :data="steplist" border stripe max-height="450">
-        <el-table-column label="ID" width="100" type="selection"></el-table-column>
+        <el-table-column  label="ID" prop="id" width="100" type="selection"></el-table-column>
+        <el-table-column  label="接口地址" prop="step_url" width="200"></el-table-column>
+        <el-table-column  label="请求方式" prop="request_type" width="100"></el-table-column>
+        <el-table-column  label="请求参数" prop="request_data" width="200"></el-table-column>
+        <el-table-column  label="响应参数" prop="response_result" width="400"></el-table-column>
+        <el-table-column  label="结果" prop="result" width="100"></el-table-column>
         <el-table-column label="操作" fixed="right" width="150">
           <template>
             <!--            修改按钮-->
@@ -55,13 +60,20 @@
                 :label="item.label"
                 :value="item.value"></el-option>
           </el-select>
-          <el-input v-model="domain.value" style="width: 150px;margin-right:20px" placeholder="断言期望"></el-input>
+          <el-select v-model="domain.argument_type" placeholder="传参类型" style="width: 120px;margin-right: 20px">
+            <el-option
+                v-for="argument in argument_type"
+                :key="argument.value"
+                :label="argument.label"
+                :value="argument.value"></el-option>
+          </el-select>
+          <el-input v-model="domain.value" style="width: 120px;margin-right:20px" placeholder="断言期望"></el-input>
           <template>
             <span v-if="assert_result[index].code === 0" style="color: #67C23A">
-              {{assert_result[index].assert_result}}
+              {{ assert_result[index].assert_result }}
             </span>
             <span v-else style="color: #f56c6c">
-              {{assert_result[index].assert_result}}
+              {{ assert_result[index].assert_result }}
             </span>
           </template>
           <el-button icon="el-icon-minus" @click.prevent="removeDomain(domain)" type="danger"
@@ -95,7 +107,7 @@
 
 <script>
 import Message from 'element-ui'
-
+import { argument_type,chose_options } from './data.js'
 export default {
   data() {
     return {
@@ -103,13 +115,14 @@ export default {
       jsonData: {},
       // 获取断言结果
       assert_result: [{
-        'code':'',
-        'assert_result':'',
+        'code': '',
+        'assert_result': '',
       }],
       // 控制显示获取参数
       showglobals: false,
       // 表单数据
       stepFrom: {
+        case_id : '',
         step_url: '',
         step_type: '',
         step_content: '',
@@ -119,40 +132,20 @@ export default {
           value: '',
           name: '',
           type: '',
+          argument_type: '',
         }],
         delivery: false,
         step_data: '',
       },
       // 接受后端的返回参数
-      steplist: [],
+      step_list: [],
       // 控制弹窗的显示还是不显示
       dialogVisible: false,
-      // 下拉选择框
-      chose_options: [{
-        value: 'equal',
-        label: '等于(==)'
-      }, {
-        value: 'not_equal',
-        label: '不等于(!=)'
-      }, {
-        value: 'less',
-        label: '小于(<)'
-      }, {
-        value: 'greater',
-        label: '大于(>)'
-      }, {
-        value: 'less_equal',
-        label: '小于等于(<=)'
-      }, {
-        value: 'greater_equal',
-        label: '大于等于(>=)'
-      }, {
-        value: 'in_to',
-        label: '包含(in)'
-      }, {
-        value: 'not_in',
-        label: '不包含(not in)'
-      }],
+      // 断言类型下拉选择框
+      chose_options,
+      // 断言参数类型
+      argument_type,
+
       addStepRules: {
         step_url: [
           {required: true, message: '请填写步骤名', trigger: 'blur'},
@@ -164,11 +157,28 @@ export default {
       }
     }
   },
+  created() {
+    if (!this.$route.params.id){
+      this.$router.push({path:'/case'})
+    }else{
+      this.$http.post('api/show-step/',
+          {'id':this.$route.params.id})
+      .then((res)=>{
+        this.step_list = res.data['data']
+        console.log(res)
+      })
+      .catch((res)=>{
+        Message.Message.error('网络错误')
+        console.log(res)
+      })
+    }
+    console.log(this.$route.params.id)
+  },
   methods: {
     addDomain() {
       this.assert_result.push({
-        'code':'',
-        'assert_result':'',
+        'code': '',
+        'assert_result': '',
       })
       this.stepFrom.assert_name.push({
         value: '',
@@ -181,7 +191,7 @@ export default {
       let index = this.stepFrom.assert_name.indexOf(item)
       if (long > 1) {
         this.stepFrom.assert_name.splice(index, 1)
-        this.assert_result.splice(index,1)
+        this.assert_result.splice(index, 1)
       } else {
         Message.Message.info('至少要有一个断言参数')
       }
