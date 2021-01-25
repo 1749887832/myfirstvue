@@ -159,7 +159,7 @@ export default {
   },
   methods: {
     getServerList() {
-      this.$http.get('api/all-server/', {params: this.queryInfo})
+      this.$http.post('api/all-server/', this.queryInfo)
           .then((res) => {
             if (res.data['code'] === 0) {
               this.serverlist = res.data['data']

@@ -6,13 +6,13 @@
         <el-button type="danger">删除步骤</el-button>
       </el-row>
       <!--列表区域-->
-      <el-table :data="steplist" border stripe max-height="450">
-        <el-table-column  label="ID" prop="id" width="100" type="selection"></el-table-column>
-        <el-table-column  label="接口地址" prop="step_url" width="200"></el-table-column>
-        <el-table-column  label="请求方式" prop="request_type" width="100"></el-table-column>
-        <el-table-column  label="请求参数" prop="request_data" width="200"></el-table-column>
-        <el-table-column  label="响应参数" prop="response_result" width="400"></el-table-column>
-        <el-table-column  label="结果" prop="result" width="100"></el-table-column>
+      <el-table :data="step_list" border stripe max-height="450">
+        <el-table-column label="ID" prop="id" width="100" type="selection"></el-table-column>
+        <el-table-column label="接口地址" prop="step_url" width="200"></el-table-column>
+        <el-table-column label="请求方式" prop="request_type" width="100"></el-table-column>
+        <el-table-column label="请求参数" prop="request_data" width="200"></el-table-column>
+        <el-table-column label="响应参数" prop="response_result" width="400"></el-table-column>
+        <el-table-column label="结果" prop="result" width="100"></el-table-column>
         <el-table-column label="操作" fixed="right" width="150">
           <template>
             <!--            修改按钮-->
@@ -33,7 +33,7 @@
         width="1000px"
         @close="addStepClose">
       <el-form label-width="100px" :inline="true" ref="addStepRef" :rules="addStepRules" :model="stepFrom">
-        <el-form-item label="url:" style="width: 500px" prop="step_name">
+        <el-form-item label="url:" style="width: 500px" prop="step_url">
           <el-input clearable placeholder="请输入请求接口" v-model="stepFrom.step_url" style="width: 400px"></el-input>
         </el-form-item>
         <el-form-item label="请求类型:" style="width: 400px" prop="step_type">
@@ -42,7 +42,7 @@
             <el-option label="GET" value="GET"></el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="body" style="width: 900px">
+        <el-form-item label="请求参数" style="width: 900px">
           <el-input type="textarea" :rows="5" style="width: 800px" v-model="stepFrom.step_content"></el-input>
         </el-form-item>
         <el-form-item
@@ -95,6 +95,24 @@
           <el-input type="textarea" :rows="5" style="width: 800px" v-model="stepFrom.step_data"></el-input>
         </el-form-item>
       </el-form>
+      <template>
+        <el-select v-model="stepFrom.server_value" placeholder="请选择" style="width: 200px;margin-right: 20px">
+          <el-option
+              v-for="item in server_list"
+              :key="item.id"
+              :label="item.name"
+              :value="item.id">
+          </el-option>
+        </el-select>
+        <el-select v-model="stepFrom.header_value" placeholder="请选择请求头" style="width: 200px;margin-right: 20px">
+          <el-option
+              v-for="item in header_list"
+              :key="item.id"
+              :label="item.headers_name"
+              :value="item.id">
+          </el-option>
+        </el-select>
+      </template>
       <el-button type="primary" @click="Debugstep">调试</el-button>
       <json-viewer :data="jsonData" :expand-depth=1 :value="jsonData"></json-viewer>
       <span slot="footer" class="dialog-footer">
@@ -107,10 +125,13 @@
 
 <script>
 import Message from 'element-ui'
-import { argument_type,chose_options } from './data.js'
+import {argument_type, chose_options} from './data.js'
+
 export default {
   data() {
     return {
+      header_list: [],
+      server_list: [],
       // 调试的json
       jsonData: {},
       // 获取断言结果
@@ -122,17 +143,19 @@ export default {
       showglobals: false,
       // 表单数据
       stepFrom: {
-        case_id : '',
+        header_value: '',
+        server_value: '',
+        case_id: '',
         step_url: '',
         step_type: '',
         step_content: '',
         argument: '',
         global_name: '',
         assert_name: [{
-          value: '',
-          name: '',
-          type: '',
-          argument_type: '',
+          value: '0',
+          name: '$.code',
+          type: 'equal',
+          argument_type: 'str',
         }],
         delivery: false,
         step_data: '',
@@ -149,7 +172,6 @@ export default {
       addStepRules: {
         step_url: [
           {required: true, message: '请填写步骤名', trigger: 'blur'},
-          {min: 3, max: 10, message: '名称在3-10个字符之间', trigger: 'blur'}
         ],
         step_type: [
           {required: true, message: '请选择请求类型', trigger: 'blur'}
@@ -158,19 +180,52 @@ export default {
     }
   },
   created() {
-    if (!this.$route.params.id){
-      this.$router.push({path:'/case'})
-    }else{
+    if (!this.$route.params.id) {
+      this.$router.push({path: '/case'})
+    } else {
       this.$http.post('api/show-step/',
-          {'id':this.$route.params.id})
-      .then((res)=>{
-        this.step_list = res.data['data']
-        console.log(res)
-      })
-      .catch((res)=>{
-        Message.Message.error('网络错误')
-        console.log(res)
-      })
+          {'id': this.$route.params.id})
+          .then((res) => {
+            if (res.data['code']===0){
+              this.step_list = res.data['data']
+            }else{
+              Message.Message.error(res.data['msg'])
+            }
+          })
+          .catch((res) => {
+            Message.Message.error('网络错误')
+            console.log(res)
+          })
+      //获取请求头
+      this.$http.post('api/show-headers/')
+          .then((res) => {
+            console.log(res)
+            if (res.data['code'] === 0) {
+              this.header_list = res.data['data']
+              this.stepFrom.header_value = this.header_list[0].headers_name
+            } else {
+              Message.Message.error(res.data['msg'])
+            }
+          })
+          .catch((res) => {
+            console.log(res)
+            Message.Message.error('网络错误')
+          })
+      // 获取环境
+      this.$http.post('api/all-server/')
+          .then((res) => {
+            if (res.data['code'] === 0){
+              this.server_list = res.data['data']
+              console.log(this.server_list)
+              this.stepFrom.server_value = this.server_list[0].name
+            }else{
+              Message.Message.error(res.data['msg'])
+            }
+          })
+          .catch((res) => {
+            Message.Message.error('网络错误')
+            console.log(res)
+          })
     }
     console.log(this.$route.params.id)
   },
@@ -181,9 +236,10 @@ export default {
         'assert_result': '',
       })
       this.stepFrom.assert_name.push({
-        value: '',
-        name: '',
-        type: ''
+        value: '0',
+        name: '$.code',
+        type: 'equal',
+        argument_type: 'str',
       })
     },
     removeDomain(item) {
