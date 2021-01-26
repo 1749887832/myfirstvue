@@ -202,7 +202,8 @@ export default {
             console.log(res)
             if (res.data['code'] === 0) {
               this.header_list = res.data['data']
-              this.stepFrom.header_value = this.header_list[0].headers_name
+              // 后面这里要判断一下，如果后端返回的为空，这里应该就会报错
+              this.stepFrom.header_value = this.header_list[0].id
             } else {
               Message.Message.error(res.data['msg'])
             }
@@ -217,7 +218,7 @@ export default {
             if (res.data['code'] === 0){
               this.server_list = res.data['data']
               console.log(this.server_list)
-              this.stepFrom.server_value = this.server_list[0].name
+              this.stepFrom.server_value = this.server_list[0].id
             }else{
               Message.Message.error(res.data['msg'])
             }
