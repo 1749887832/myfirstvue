@@ -84,11 +84,14 @@
           <el-switch v-model="stepFrom.delivery" @change="showGlobal"></el-switch>
         </el-form-item>
         <div v-show="showglobals">
-          <el-form-item label="变量名">
-            <el-input v-model="stepFrom.global_name" placeholder="请输入使用参数的变量名"></el-input>
-          </el-form-item>
-          <el-form-item label="参数名">
-            <el-input v-model="stepFrom.argument" placeholder="参数名必须为后端返回"></el-input>
+          <el-form-item v-for="(domain, index) in stepFrom.global_content"
+                        :label="'变量' + index"
+                        :key="domain.key"
+                        :prop="'assert_name.' + index + '.value'">
+            <el-input v-model="domain.global_name" placeholder="参数的变量名" style="width: 150px;margin-right: 20px"></el-input>
+            <el-input v-model="domain.argument" placeholder="参数名" style="width: 150px;margin-right: 20px"></el-input>
+            <el-button icon="el-icon-minus" @click.prevent="removeGloabl(domain)" type="danger" :circle="true"></el-button>
+            <el-button icon="el-icon-plus" @click="addGloabl" :circle="true" type="primary"></el-button>
           </el-form-item>
         </div>
         <el-form-item label="步骤描述" style="width: 900px">
@@ -149,8 +152,10 @@ export default {
         step_url: '',
         step_type: '',
         step_content: '',
-        argument: '',
-        global_name: '',
+        global_content: [{
+          argument: '',
+          global_name: '',
+        }],
         assert_name: [{
           value: '0',
           name: '$.code',
@@ -186,9 +191,9 @@ export default {
       this.$http.post('api/show-step/',
           {'id': this.$route.params.id})
           .then((res) => {
-            if (res.data['code']===0){
+            if (res.data['code'] === 0) {
               this.step_list = res.data['data']
-            }else{
+            } else {
               Message.Message.error(res.data['msg'])
             }
           })
@@ -215,11 +220,11 @@ export default {
       // 获取环境
       this.$http.post('api/all-server/')
           .then((res) => {
-            if (res.data['code'] === 0){
+            if (res.data['code'] === 0) {
               this.server_list = res.data['data']
               console.log(this.server_list)
               this.stepFrom.server_value = this.server_list[0].id
-            }else{
+            } else {
               Message.Message.error(res.data['msg'])
             }
           })
@@ -243,6 +248,12 @@ export default {
         argument_type: 'str',
       })
     },
+    addGloabl(){
+      this.stepFrom.global_content.push({
+        argument: '',
+        global_name: '',
+      })
+    },
     removeDomain(item) {
       let long = this.stepFrom.assert_name.length
       let index = this.stepFrom.assert_name.indexOf(item)
@@ -251,6 +262,16 @@ export default {
         this.assert_result.splice(index, 1)
       } else {
         Message.Message.info('至少要有一个断言参数')
+      }
+    },
+    removeGloabl(item){
+      let long = this.stepFrom.global_content.length
+      let index = this.stepFrom.global_content.indexOf(item)
+      if (long > 1) {
+        this.stepFrom.global_content.splice(index, 1)
+        this.global_content.splice(index, 1)
+      } else {
+        Message.Message.info('至少要有一个变量')
       }
     },
     showGlobal(nowstatus) {
@@ -289,7 +310,7 @@ export default {
         this.$http.post('api/debug-step/',
             this.stepFrom)
             .then((res) => {
-              if (res.data['code'] === 0) {
+              if (res.data['code'] === 0 && res.data['data'].length !== 0) {
                 this.jsonData = res.data['data'][0]
                 this.assert_result = res.data['data'][1]
                 console.log(this.assert_result)
