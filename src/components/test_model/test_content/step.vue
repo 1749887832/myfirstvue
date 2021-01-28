@@ -90,6 +90,7 @@
                         :prop="'assert_name.' + index + '.value'">
             <el-input v-model="domain.global_name" placeholder="参数的变量名" style="width: 150px;margin-right: 20px"></el-input>
             <el-input v-model="domain.argument" placeholder="参数名" style="width: 150px;margin-right: 20px"></el-input>
+            <el-input v-model="domain.index" placeholder="下标" style="width: 150px;margin-right: 20px"></el-input>
             <el-button icon="el-icon-minus" @click.prevent="removeGloabl(domain)" type="danger" :circle="true"></el-button>
             <el-button icon="el-icon-plus" @click="addGloabl" :circle="true" type="primary"></el-button>
           </el-form-item>
@@ -155,6 +156,7 @@ export default {
         global_content: [{
           argument: '',
           global_name: '',
+          index:'',
         }],
         assert_name: [{
           value: '0',
@@ -252,6 +254,7 @@ export default {
       this.stepFrom.global_content.push({
         argument: '',
         global_name: '',
+        index: '',
       })
     },
     removeDomain(item) {
