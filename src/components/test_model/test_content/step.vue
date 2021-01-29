@@ -7,13 +7,14 @@
       </el-row>
       <!--列表区域-->
       <el-table :data="step_list" border stripe max-height="450">
-        <el-table-column label="ID" prop="id" width="100" type="selection"></el-table-column>
-        <el-table-column label="接口地址" prop="step_url" width="200"></el-table-column>
-        <el-table-column label="请求方式" prop="request_type" width="100"></el-table-column>
-        <el-table-column label="请求参数" prop="request_data" width="200"></el-table-column>
-        <el-table-column label="响应参数" prop="response_result" width="400"></el-table-column>
-        <el-table-column label="结果" prop="result" width="100"></el-table-column>
-        <el-table-column label="操作" fixed="right" width="150">
+        <el-table-column type="selection" min-width="55"></el-table-column>
+        <el-table-column label="ID" prop="id" min-width="100"></el-table-column>
+        <el-table-column label="接口地址" prop="step_url" min-width="400"></el-table-column>
+        <el-table-column label="请求方式" prop="request_type" min-width="100"></el-table-column>
+        <el-table-column label="请求参数" prop="request_data" min-width="1000" :show-overflow-tooltip="true"></el-table-column>
+        <el-table-column label="创建时间" prop="create_time" min-width="150"></el-table-column>
+        <el-table-column label="创建人" prop="create_user" min-width="150"></el-table-column>
+        <el-table-column label="操作" fixed="right" min-width="150">
           <template>
             <!--            修改按钮-->
             <el-tooltip effect="dark" content="修改" placement="top" :enterable="false">
@@ -27,7 +28,7 @@
         </el-table-column>
       </el-table>
     </el-card>
-    <addstepdialog :visible.sync="visible" :case_id="case_id"></addstepdialog>
+    <addstepdialog :visible.sync="visible" :case_id="case_id" @addStep="GetStepList"></addstepdialog>
   </div>
 </template>
 
@@ -54,6 +55,16 @@ export default {
       this.$router.push({path: '/case'})
     } else {
       this.case_id = this.$route.params.id
+      this.GetStepList()
+    }
+    console.log(this.$route.params.id)
+  },
+  methods: {
+    openAddstep() {
+      console.log(this.visible)
+      this.visible = true
+    },
+    GetStepList(){
       this.$http.post('api/show-step/',
           {'id': this.$route.params.id})
           .then((res) => {
@@ -67,13 +78,6 @@ export default {
             Message.Message.error('网络错误')
             console.log(res)
           })
-    }
-    console.log(this.$route.params.id)
-  },
-  methods: {
-    openAddstep() {
-      console.log(this.visible)
-      this.visible = true
     }
   }
 }

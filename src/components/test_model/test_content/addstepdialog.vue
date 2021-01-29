@@ -179,7 +179,6 @@ export default {
     //获取请求头
     this.$http.post('api/show-headers/')
         .then((res) => {
-          console.log(res)
           if (res.data['code'] === 0) {
             this.header_list = res.data['data']
             // 后面这里要判断一下，如果后端返回的为空，这里应该就会报错
@@ -188,8 +187,7 @@ export default {
             Message.Message.error(res.data['msg'])
           }
         })
-        .catch((res) => {
-          console.log(res)
+        .catch(() => {
           Message.Message.error('网络错误')
         })
     // 获取环境
@@ -197,15 +195,13 @@ export default {
         .then((res) => {
           if (res.data['code'] === 0) {
             this.server_list = res.data['data']
-            console.log(this.server_list)
             this.stepFrom.server_value = this.server_list[0].id
           } else {
             Message.Message.error(res.data['msg'])
           }
         })
-        .catch((res) => {
+        .catch(() => {
           Message.Message.error('网络错误')
-          console.log(res)
         })
   },
   methods: {
@@ -265,23 +261,23 @@ export default {
     },
     addStep() {
       this.$refs.addStepRef.validate(async res => {
-        console.log(res)
-        console.log(this.stepFrom)
         if (!res) return;
         this.$http.post('api/add-step/',
             this.stepFrom)
             .then((res) => {
-              console.log(res)
+              if (res.data['code']===0){
+                this.addStepClose()
+                Message.Message.success('添加成功')
+              }else{
+                Message.Message.success(res.data['msg'])
+              }
             })
-            .catch((res) => {
-              console.log(res)
+            .catch(() => {
             })
       })
     },
     Debugstep() {
       this.$refs.addStepRef.validate(async res => {
-        console.log(res)
-        console.log(this.stepFrom)
         if (!res) return;
         const loading = this.$loading({
           lock: true,
@@ -295,7 +291,6 @@ export default {
               if (res.data['code'] === 0 && res.data['data'].length !== 0) {
                 this.jsonData = res.data['data'][0]
                 this.assert_result = res.data['data'][1]
-                console.log(this.stepFrom.delivery)
                 if (this.stepFrom.delivery) {
                   this.global_result = res.data['data'][2]
                 } else {
@@ -309,23 +304,21 @@ export default {
                     'msg': ''
                   }]
                 }
-                console.log(this.assert_result)
               } else {
                 Message.Message.error('调试失败')
               }
-              console.log(res)
               loading.close()
             },)
-            .catch((res) => {
+            .catch(() => {
               loading.close()
               Message.Message.error('网络错误')
-              console.log(res)
             })
       })
     },
     addStepClose() {
       this.$refs.addStepRef.resetFields()
       this.$emit('update:visible', false)
+      this.$emit('addStep')
     }
   }
 }
