@@ -158,12 +158,10 @@ export default {
       window.sessionStorage.clear()
       this.$http.post('api/logout/')
           .then((res) => {
-            console.log(res)
             Message.Message.success(res.data['msg'])
             this.$router.push({path: '/login'})
           })
-          .catch((res) => {
-            console.log(res)
+          .catch(() => {
             Message.Message.error('网络错误')
           })
     },

@@ -54,30 +54,17 @@ export default {
   methods: {
     //点击重置按钮，重置登录表单
     resetLgoinForm() {
-      console.log(this)
       this.$refs.loginFormRef.resetFields();
     },
-    login() {
+    async login() {
       this.$refs.loginFormRef.validate(async valid => {
-        console.log(valid)
         if (!valid) return;
-        this.$http.post('api/login/',
-            this.LoginForm)
-            .then((res) => {
-              console.log(res.data)
-              // 验证返回的是否正确
-              if (res.data['code'] === 0){
-                Message.Message.success('登录成功')
-                // 保存token
-                window.sessionStorage.setItem('token', res.data['token'])
-                return this.$router.push({path: '/home'})
-              }else{
-                Message.Message.error(res.data['msg'])
-              }
-            })
-            .catch(() => {
-              Message.Message.error('网络错误')
-            })
+        const {data:res} = await this.$http.post('api/login/', this.LoginForm)
+        console.log(res)
+        Message.Message.success('登录成功')
+        // 保存token
+        window.sessionStorage.setItem('token', res['token'])
+        return this.$router.push({path: '/home'})
       });
     }
   }

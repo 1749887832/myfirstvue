@@ -15,7 +15,7 @@ Vue.use(jsonViewer)
 // 配置请求的根路径
 Vue.config.productionTip = false
 axios.interceptors.request.use(config => {
-    console.log(config)
+    // console.log(config)
     // 在最后必须return 这个config
     config.headers.Authorization = window.sessionStorage.getItem('token')
     config.headers['Content_Type'] = 'text/plain'
@@ -25,7 +25,14 @@ axios.interceptors.response.use(config => {
     if (config.data['code'] === 1010) {
         Message.error(config.data['msg'])
         router.push('/login')
-    } else {
+    }
+    if(config.data['code'] === -1){
+        Message.error(config.data['msg'])
+    }
+    if (config.status !==200){
+        Message.error('网络错误')
+    }
+    else {
         return config
     }
 })

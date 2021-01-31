@@ -1,10 +1,6 @@
 <template>
   <div>
     <el-card class="box-card">
-      <el-tabs v-model="activeName" @tab-click="handleTabClick">
-        <el-tab-pane label="用户管理" name="first"></el-tab-pane>
-        <el-tab-pane label="配置管理" name="second"></el-tab-pane>
-      </el-tabs>
       <el-row :gutter="20">
         <el-col :span="6">
           <el-input placeholder="请输入名" v-model="queryInfo.globalname">
@@ -38,6 +34,7 @@
           </el-date-picker>
         </el-col>
       </el-row>
+      <el-button type="primary" style="margin-top: 15px">添加变量</el-button>
       <el-table :data="gloaballist" border stripe max-height="450">
         <el-table-column label="ID" prop="id" width="100"></el-table-column>
         <el-table-column label="变量名" prop="globals_name" width="150"></el-table-column>
@@ -146,24 +143,6 @@ export default {
     // 监听页码值改变的事件
     handleCurrentChange(newPage) {
       this.queryInfo.page = newPage
-      this.getGloballist()
-    },
-    handleTabClick(tab) {
-      console.log(tab.name)
-      this.chose_user = ''
-      this.chose_time = ''
-      this.queryInfo={
-        globalname: '',
-        // 选项
-        chose_option: '',
-        // 开始时间
-        start_time: '',
-        // 结束时间
-        end_time: '',
-        // 当前的页数
-        page: 1,
-        limit: 10
-      }
       this.getGloballist()
     },
     getGloballist() {

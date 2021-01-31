@@ -28,6 +28,7 @@
         <el-table-column label="IP地址" prop="server_ip" width="250"></el-table-column>
         <el-table-column label="描述" prop="server_describe" width="250"></el-table-column>
         <el-table-column label="创建时间" prop="create_time" width="150"></el-table-column>
+        <el-table-column label="创建人" prop="create_user" width="150"></el-table-column>
         <el-table-column label="状态">
           <!--          作用域插槽-->
           <template slot-scope="scope">
@@ -74,7 +75,7 @@
           <el-input v-model="addServer.serverip"></el-input>
         </el-form-item>
         <el-form-item label="服务描述">
-          <el-input type="textarea" v-model="addServer.server_desc"></el-input>
+          <el-input type="textarea" prop="server_desc" v-model="addServer.server_desc"></el-input>
         </el-form-item>
       </el-form>
       <!--      底部区-->
@@ -150,7 +151,8 @@ export default {
         ],
         serverip: [
           {required: true, message: '请输入服务IP', trigger: 'blur'},
-        ]
+        ],
+        server_desc: []
       }
     }
   },
@@ -158,19 +160,10 @@ export default {
     this.getServerList()
   },
   methods: {
-    getServerList() {
-      this.$http.post('api/all-server/', this.queryInfo)
-          .then((res) => {
-            if (res.data['code'] === 0) {
-              this.serverlist = res.data['data']
-              this.total = res.data['total']
-            } else {
-              Message.Message.error(res.data['msg'])
-            }
-          })
-          .catch(() => {
-            Message.Message.error('网络错误')
-          })
+    async getServerList() {
+      const {data: res} = await this.$http.post('api/all-server/', this.queryInfo)
+      this.serverlist = res['data']
+      this.total = res['total']
     },
     // 监听limit改变的事件
     handleSizeChange(newLimit) {
@@ -183,52 +176,28 @@ export default {
       this.getServerList()
     },
     // 监听状态改变
-    serverChange(serverinfo) {
-      console.log(serverinfo)
-      this.$http.post('api/update-server/',
-          serverinfo)
-          .then((res) => {
-            if (res.data['code'] === 0) {
-              Message.Message.success(res.data['msg'])
-            } else {
-              serverinfo.server_status = !serverinfo.server_status
-              Message.Message.error(res.data['msg'])
-            }
-          })
-          .catch(() => {
-            serverinfo.server_status = !serverinfo.server_status
-            console.log('网络错误')
-          })
+    async serverChange(serverinfo) {
+      const {data: res} = await this.$http.post('api/update-server/', serverinfo)
+      Message.Message.success(res['msg'])
     },
     // 调用添加的接口
-    addDialogServer() {
+    async addDialogServer() {
       this.$refs.addFormRef.validate(async res => {
-        console.log(res)
         if (!res) return;
-        this.$http.post('api/add-server/',
-            this.addServer)
-            .then((res) => {
-              if (res.data['code'] === 0) {
-                this.addDialogVisible = false
-                Message.Message.success(res.data['msg'])
-                this.getServerList()
-              } else {
-                Message.Message.error(res.data['msg'])
-              }
-              console.log(res)
-            })
-            .catch((res) => {
-              console.log(res)
-              Message.Message.error(res.data['msg'])
-            })
+        const {data: content} = await this.$http.post('api/add-server/', this.addServer)
+        this.addDialogVisible = false
+        Message.Message.success(content['msg'])
+        this.getServerList()
       })
     },
     //  监听添加对话框的关闭事件
     addDiaClose() {
       this.$refs.addFormRef.resetFields()
+      this.addServer = {}
     },
     editDiaClose() {
       this.$refs.editFormRef.resetFields()
+      this.editServer = {}
     },
     // 打开删除确认框
     opendelete(deleteservername) {
@@ -247,7 +216,6 @@ export default {
     },
     // 调用删除接口
     RemoveServer(deleteservername) {
-      console.log(deleteservername)
       this.$http.post('api/delete-server/',
           deleteservername)
           .then((res) => {
@@ -265,22 +233,18 @@ export default {
     // 编辑弹窗
     serverEdit(editserver) {
       this.editDialogVisible = true
-      console.log(editserver)
       this.editServer.server_id = editserver.id
       this.editServer.servername = editserver.name
       this.editServer.serverip = editserver.server_ip
       this.editServer.server_desc = editserver.server_describe
-      console.log(this.editServer)
     },
     // 编辑请求接口
     editDialogServer() {
       this.$refs.editFormRef.validate(async res => {
-        console.log(res)
         if (!res) return;
         this.$http.post('api/editserver/',
             this.editServer)
             .then((res) => {
-              console.log(res)
               if (res.data['code'] === 0) {
                 Message.Message.success(res.data['msg'])
                 this.editDialogVisible = false
@@ -290,8 +254,7 @@ export default {
                 this.editDialogVisible = false
               }
             })
-            .catch((res) => {
-              console.log(res)
+            .catch(() => {
               Message.Message.error('网络错误')
             })
       })
