@@ -34,7 +34,7 @@
           </el-date-picker>
         </el-col>
       </el-row>
-      <el-button type="primary" style="margin-top: 15px">添加变量</el-button>
+      <el-button type="primary" style="margin-top: 15px" @click="openglobalConfirm">添加变量</el-button>
       <el-table :data="gloaballist" border stripe max-height="450">
         <el-table-column label="ID" prop="id" width="100"></el-table-column>
         <el-table-column label="变量名" prop="globals_name" width="150"></el-table-column>
@@ -66,12 +66,19 @@
           :total="total">
       </el-pagination>
     </el-card>
+    <global_confirm :visible.sync="visible"></global_confirm>
   </div>
 </template>
 <script>
+import global_confirm from "@/components/server_model/global_model/global_confirm";
+
 export default {
+  components: {
+    global_confirm
+  },
   data() {
     return {
+      visible: false,
       queryInfo: {
         globalname: '',
         // 选项
@@ -145,17 +152,10 @@ export default {
       this.queryInfo.page = newPage
       this.getGloballist()
     },
-    getGloballist() {
-      this.$http.post('api/show-global/'
-          , this.queryInfo)
-          .then((res) => {
-            console.log(res)
-            this.gloaballist = res.data['data']
-            this.total = res.data['total']
-          })
-          .catch((res) => {
-            console.log(res)
-          })
+    async getGloballist() {
+      const {data: res} = await this.$http.post('api/show-global/', this.queryInfo)
+      this.gloaballist = res['data']
+      this.total = res['total']
     },
     getChosedata(data) {
       console.log(typeof data)
@@ -164,11 +164,14 @@ export default {
       this.getGloballist()
       console.log(data)
     },
-    getChoseTime(time){
+    getChoseTime(time) {
       console.log(time[0])
-      this.queryInfo.start_time=time[0]
-      this.queryInfo.end_time=time[1]
+      this.queryInfo.start_time = time[0]
+      this.queryInfo.end_time = time[1]
       this.getGloballist()
+    },
+    openglobalConfirm() {
+      this.visible = true
     }
   },
 

@@ -48,7 +48,7 @@ const router = new Router({
                 {
                     path: '/global',
                     name: 'global',
-                    component: () => import('./components/server_model/global')
+                    component: () => import('./components/server_model/global_model/global')
                 },
                 {
                     path: '/model',
