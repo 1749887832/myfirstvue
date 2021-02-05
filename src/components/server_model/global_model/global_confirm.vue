@@ -5,6 +5,9 @@
       width="1000px"
       @close="CloseGlobalConfirm">
     <el-form label-width="80" :inline="true" ref="AddGloable" :model="AddglobalValue" :rules="Addglobalrules">
+      <el-form-item label="变量名" prop="statename">
+        <el-input style="width: 750px" v-model="AddglobalValue.statename"></el-input>
+      </el-form-item>
       <el-form-item label="使用名" style="width: 300px" prop="globalname">
         <el-input style="width: 150px" v-model="AddglobalValue.globalname"></el-input>
       </el-form-item>
@@ -28,10 +31,13 @@
           </el-option>
         </el-select>
       </el-form-item>
+      <el-form-item label="描述" label-width="64.38px">
+        <el-input type="textarea" style="width: 770px" rows="2" v-model="AddglobalValue.content"></el-input>
+      </el-form-item>
       <div v-show="fixation" style="width: 900px">
         <template>
           <el-form-item label="变量名" label-width="64.38px">
-            <el-input type="textarea" style="width: 770px" rows="5" v-model="AddglobalValue.globalagrument"></el-input>
+            <el-input type="textarea" style="width: 770px" rows="3" v-model="AddglobalValue.globalagrument"></el-input>
           </el-form-item>
         </template>
       </div>
@@ -73,14 +79,18 @@
                 <el-input type="textarea" style="width: 762px" rows="5" v-model="AddglobalValue.urlbody"></el-input>
               </el-form-item>
               <el-form-item label="参数" label-width="64.38px">
-                <el-input v-model="AddglobalValue.urlarument"></el-input>
+                <el-input v-model="AddglobalValue.getvalue[0].urlarument"></el-input>
               </el-form-item>
               <el-form-item label="下标">
-                <el-input v-model="AddglobalValue.urlindex"></el-input>
+                <el-input v-model="AddglobalValue.getvalue[0].urlindex"></el-input>
               </el-form-item>
+              <template>
+                <span style="color:#67C23A;max-width: 200px;line-height: 3">{{ returnvaue }}</span>
+              </template>
             </el-form>
             <template>
-              <el-select v-model="AddglobalValue.server" placeholder="请选择" style="width: 200px;margin-right: 20px;margin-left: 64px">
+              <el-select v-model="AddglobalValue.server" placeholder="请选择"
+                         style="width: 200px;margin-right: 20px;margin-left: 64px">
                 <el-option
                     v-for="item in serverList"
                     :key="item.id"
@@ -88,7 +98,8 @@
                     :value="item.id">
                 </el-option>
               </el-select>
-              <el-select v-model="AddglobalValue.headers" placeholder="请选择请求头" style="width: 200px;margin-right: 20px">
+              <el-select v-model="AddglobalValue.headers" clearable placeholder="请选择请求头"
+                         style="width: 200px;margin-right: 20px">
                 <el-option
                     v-for="item in headersList"
                     :key="item.id"
@@ -97,7 +108,7 @@
                 </el-option>
               </el-select>
             </template>
-            <el-button type="primary">调试</el-button>
+            <el-button type="primary" @click="debugapi">调试</el-button>
             <json-viewer :data="jsonData" :expand-depth=1 :value="jsonData"></json-viewer>
           </template>
         </div>
@@ -112,6 +123,8 @@
 
 <script>
 import {globaltype} from './typedata'
+import {Message} from "element-ui";
+
 export default {
   name: "global_confirm",
   props: {
@@ -124,20 +137,24 @@ export default {
   data() {
     return {
       // 提交表单数据
-      AddglobalValue:{
-        globalname:'',
-        globaltype:0,
-        globalstyle:'int',
-        globalagrument:'',
-        realtype:0,
-        funname:'',
-        urlname:'',
-        urltype:'POST',
-        urlbody:'',
-        urlarument:'',
-        urlindex:'',
-        headers:'',
-        server:''
+      AddglobalValue: {
+        statename: '',
+        globalname: '',
+        globaltype: 0,
+        globalstyle: 'int',
+        globalagrument: '',
+        realtype: 0,
+        funname: '',
+        urlname: '',
+        urltype: 'POST',
+        urlbody: '',
+        getvalue: [{
+          urlarument: '',
+          urlindex: '',
+        }],
+        headers: '',
+        server: '',
+        content:'',
       },
       jsonData: {},
       // 控制实时div显示
@@ -163,7 +180,7 @@ export default {
         value: 1,
         label: '接口'
       }],
-      requesttype:[
+      requesttype: [
         {
           value: 'POST',
           label: 'POST'
@@ -174,12 +191,17 @@ export default {
       ],
       serverList: [],
       headersList: [],
-      Addglobalrules:{
-        globalname:[
-          {required:true,message:'使用名为必填项',trigger:'blur'}
+      // 调试返回
+      returnvaue: '',
+      Addglobalrules: {
+        statename: [
+          {required: true, message: '使用名为必填项', trigger: 'blur'}
         ],
-        globalagrument:[
-          {required:true,message:'变量名为必填项',trigger:'blur'}
+        globalname: [
+          {required: true, message: '使用名为必填项', trigger: 'blur'}
+        ],
+        globalagrument: [
+          {required: true, message: '变量名为必填项', trigger: 'blur'}
         ]
       }
     };
@@ -189,7 +211,7 @@ export default {
     this.getServerAndHeader()
   },
   methods: {
-    async getServerAndHeader(){
+    async getServerAndHeader() {
       const {data: server} = await this.$http.post('api/all-server/')
       this.serverList = server['data']
       const {data: header} = await this.$http.post('api/show-headers/')
@@ -220,10 +242,29 @@ export default {
       }
     },
     // 添加变量
-    AddGloabalFun(){
-      this.$refs.AddGloable.validate(async res=>{
+    AddGloabalFun() {
+      this.$refs.AddGloable.validate(async res => {
         if (!res) return;
+        const {data: msg} = await this.$http.post('api/add_global/', this.AddglobalValue)
+        Message.success(msg['msg'])
         console.log(this.AddglobalValue)
+      })
+    },
+    async debugapi() {
+      this.$refs.AddGloable.validate(async res => {
+        if (!res) return;
+        const loading = this.$loading({
+          lock: true,
+          text: 'Loading',
+          spinner: 'el-icon-loading',
+          background: 'rgba(0, 0, 0, 0.7)'
+        })
+        const {data: returnmsg} = await this.$http.post('api/debug-api/', this.AddglobalValue)
+        this.jsonData = returnmsg['data']['list']
+        if (returnmsg['data']['extend'].length !== 0) {
+          this.returnvaue = returnmsg['data']['extend'][0]['msg']
+        }
+        loading.close()
       })
     }
   }
