@@ -154,7 +154,7 @@ export default {
         }],
         headers: '',
         server: '',
-        content:'',
+        content: '',
       },
       jsonData: {},
       // 控制实时div显示
@@ -219,7 +219,6 @@ export default {
     },
     CloseGlobalConfirm() {
       this.$refs.AddGloable.resetFields()
-      this.AddglobalValue = {}
       this.$emit('update:visible', false)
     },
     // 监听下拉框的值，显示相应的变量
@@ -246,25 +245,31 @@ export default {
       this.$refs.AddGloable.validate(async res => {
         if (!res) return;
         const {data: msg} = await this.$http.post('api/add_global/', this.AddglobalValue)
-        Message.success(msg['msg'])
+        if (msg['code'] === 0) {
+          Message.success(msg['msg'])
+          this.CloseGlobalConfirm()
+          console.log(this.AddglobalValue)
+        }
         console.log(this.AddglobalValue)
       })
     },
     async debugapi() {
       this.$refs.AddGloable.validate(async res => {
         if (!res) return;
-        const loading = this.$loading({
-          lock: true,
-          text: 'Loading',
-          spinner: 'el-icon-loading',
-          background: 'rgba(0, 0, 0, 0.7)'
-        })
+        // const loading = this.$loading({
+        //   lock: true,
+        //   text: '调试中',
+        //   spinner: 'el-icon-loading',
+        //   background: 'rgba(0, 0, 0, 0.7)'
+        // })
         const {data: returnmsg} = await this.$http.post('api/debug-api/', this.AddglobalValue)
-        this.jsonData = returnmsg['data']['list']
-        if (returnmsg['data']['extend'].length !== 0) {
-          this.returnvaue = returnmsg['data']['extend'][0]['msg']
+        if (returnmsg['code'] === 0) {
+          this.jsonData = returnmsg['data']['list']
+          if (returnmsg['data']['extend'].length !== 0){
+            this.returnvaue = returnmsg['data']['extend'][0]['msg']
+          }
         }
-        loading.close()
+        // loading.close()
       })
     }
   }

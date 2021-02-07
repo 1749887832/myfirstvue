@@ -8,7 +8,7 @@ import jsonViewer from 'vue-json-viewer'
 import './assets/css/global.css'
 import './plugins/element.js'
 import {Message} from "element-ui";
-
+// import 'default-passive-events'
 Vue.prototype.$http = axios
 Vue.prototype.$qs = qs
 Vue.use(jsonViewer)
