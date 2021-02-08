@@ -220,6 +220,7 @@ export default {
     CloseGlobalConfirm() {
       this.$refs.AddGloable.resetFields()
       this.$emit('update:visible', false)
+      this.$emit('showGlobal')
     },
     // 监听下拉框的值，显示相应的变量
     ChangeGlobal(Checked) {
@@ -244,7 +245,7 @@ export default {
     AddGloabalFun() {
       this.$refs.AddGloable.validate(async res => {
         if (!res) return;
-        const {data: msg} = await this.$http.post('api/add_global/', this.AddglobalValue)
+        const {data: msg} = await this.$http.post('api/add-global/', this.AddglobalValue)
         if (msg['code'] === 0) {
           Message.success(msg['msg'])
           this.CloseGlobalConfirm()
@@ -256,20 +257,24 @@ export default {
     async debugapi() {
       this.$refs.AddGloable.validate(async res => {
         if (!res) return;
-        // const loading = this.$loading({
-        //   lock: true,
-        //   text: '调试中',
-        //   spinner: 'el-icon-loading',
-        //   background: 'rgba(0, 0, 0, 0.7)'
-        // })
+        const loading = this.$loading({
+          lock: true,
+          text: '调试中',
+          spinner: 'el-icon-loading',
+          background: 'rgba(0, 0, 0, 0.7)'
+        })
         const {data: returnmsg} = await this.$http.post('api/debug-api/', this.AddglobalValue)
         if (returnmsg['code'] === 0) {
+          this.returnvaue = ''
           this.jsonData = returnmsg['data']['list']
           if (returnmsg['data']['extend'].length !== 0){
             this.returnvaue = returnmsg['data']['extend'][0]['msg']
           }
+        }else{
+          this.jsonData = {}
+          this.returnvaue = ''
         }
-        // loading.close()
+        loading.close()
       })
     }
   }

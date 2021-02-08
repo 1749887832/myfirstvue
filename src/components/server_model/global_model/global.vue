@@ -12,10 +12,10 @@
                      @clear="getGloballist"
                      @change="getChosedata">
             <el-option
-                v-for="item in options"
-                :key="item.value"
-                :label="item.label"
-                :value="item.value">
+                v-for="item in userlist"
+                :key="item.id"
+                :label="item.user_name"
+                :value="item.id">
             </el-option>
           </el-select>
         </el-col>
@@ -35,7 +35,7 @@
         </el-col>
       </el-row>
       <el-button type="primary" style="margin-top: 15px" @click="openglobalConfirm">添加变量</el-button>
-      <el-table :data="gloaballist" border stripe max-height="450">
+      <el-table :data="gloaballist" border stripe max-height="430">
         <el-table-column label="ID" prop="id" width="100"></el-table-column>
         <el-table-column label="变量名" prop="globals_name" width="150"></el-table-column>
         <el-table-column label="使用名" prop="use_name" width="150"></el-table-column>
@@ -46,12 +46,12 @@
         <el-table-column label="描述" prop="content" width="200"></el-table-column>
         <el-table-column label="创建人" prop="create_user" width="100"></el-table-column>
         <el-table-column label="操作" fixed="right" width="150">
-          <template>
+          <template slot-scope="scope">
             <el-tooltip effect="dark" content="修改" placement="top" :enterable="false">
               <el-button type="primary" icon="el-icon-edit"></el-button>
             </el-tooltip>
             <el-tooltip effect="dark" content="删除" placement="top" :enterable="false">
-              <el-button type="danger" icon="el-icon-delete"></el-button>
+              <el-button type="danger" icon="el-icon-delete" @click="openGlobal(scope.row)"></el-button>
             </el-tooltip>
           </template>
         </el-table-column>
@@ -66,11 +66,14 @@
           :total="total">
       </el-pagination>
     </el-card>
-    <global_confirm :visible.sync="visible"></global_confirm>
+    <global_confirm :visible.sync="visible"
+                    @showGlobal="getGloballist"
+    ></global_confirm>
   </div>
 </template>
 <script>
 import global_confirm from "@/components/server_model/global_model/global_confirm";
+import Message from 'element-ui'
 
 export default {
   components: {
@@ -91,24 +94,9 @@ export default {
         page: 1,
         limit: 10
       },
+      userlist:'',
       total: 0,
       activeName: 'first',
-      options: [{
-        value: '选项1',
-        label: '黄金糕'
-      }, {
-        value: '选项2',
-        label: '双皮奶'
-      }, {
-        value: '选项3',
-        label: '蚵仔煎'
-      }, {
-        value: '选项4',
-        label: '龙须面'
-      }, {
-        value: '选项5',
-        label: '北京烤鸭'
-      }],
       pickerOptions: {
         shortcuts: [{
           text: '最近一周',
@@ -142,6 +130,11 @@ export default {
     }
   },
   methods: {
+    // 获取全部的用户
+    async getalluser(){
+      const {data:res} = await this.$http.post('api/show-user/')
+      this.userlist = res['data']
+    },
     // 监听limit改变的事件
     handleSizeChange(newLimit) {
       this.queryInfo.limit = newLimit
@@ -165,18 +158,42 @@ export default {
       console.log(data)
     },
     getChoseTime(time) {
-      console.log(time[0])
-      this.queryInfo.start_time = time[0]
-      this.queryInfo.end_time = time[1]
+      if (time === null) {
+        this.queryInfo.start_time = ''
+        this.queryInfo.end_time = ''
+      } else {
+        this.queryInfo.start_time = time[0] + ' 00:00:00'
+        this.queryInfo.end_time = time[1] + ' 23:59:59'
+      }
       this.getGloballist()
     },
     openglobalConfirm() {
       this.visible = true
-    }
+    },
+    async delglobal(delglobalID) {
+      const {data: res} =await this.$http.post('api/del-global/', delglobalID)
+      Message.Message.success(res['msg'])
+      this.getGloballist()
+    },
+    openGlobal(delglobalID) {
+      this.$confirm('此操作将永久删除, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        this.delglobal(delglobalID)
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: '已取消删除'
+        });
+      });
+    },
   },
 
   created() {
     this.getGloballist()
+    this.getalluser()
   }
 }
 </script>

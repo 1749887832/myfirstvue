@@ -27,7 +27,7 @@
       </el-table>
     </el-card>
     <el-dialog
-        title="编辑服务"
+        title="添加请求头"
         :visible.sync="addDialogVisible"
         width="50%"
         @close="addDiaClose">
