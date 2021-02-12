@@ -13,7 +13,7 @@
         <el-table-column label="ID" min-width="100" prop="id"></el-table-column>
         <el-table-column label="请求名" min-width="100" prop="headers_name"></el-table-column>
         <el-table-column label="请求体" min-width="650" prop="headers_body"></el-table-column>
-        <el-table-column label="请求描述" min-width="100" prop="headers_content"></el-table-column>
+        <el-table-column label="请求描述" min-width="200" prop="headers_content"></el-table-column>
         <el-table-column label="操作" fixed="right" width="150">
           <template>
             <el-tooltip effect="dark" content="修改" placement="top" :enterable="false">

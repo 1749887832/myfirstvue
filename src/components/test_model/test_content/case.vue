@@ -4,16 +4,19 @@
       <el-row :gutter="40">
         <el-col :span="8">
           <el-input placeholder="请输入名">
-            <el-button slot="append" icon="el-icon-search"></el-button>
+            <el-button slot="append" icon="el-icon-search" @click="getCaseList"></el-button>
           </el-input>
         </el-col>
         <el-col :span="4">
-          <el-select v-model="chose_user" clearable placeholder="请选择">
+          <el-select v-model="chose_user"
+                     @change="getChoseUser"
+                     @click="getCaseList"
+                     clearable placeholder="请选择">
             <el-option
-                v-for="item in options"
-                :key="item.value"
-                :label="item.label"
-                :value="item.value">
+                v-for="item in userList"
+                :key="item.id"
+                :label="item.user_name"
+                :value="item.id">
             </el-option>
           </el-select>
         </el-col>
@@ -27,7 +30,8 @@
               start-placeholder="开始日期"
               end-placeholder="结束日期"
               :picker-options="pickerOptions"
-              value-format="yyyy-MM-dd">
+              value-format="yyyy-MM-dd"
+              @change="getChoseTime">
           </el-date-picker>
         </el-col>
         <el-col :span="4">
@@ -36,8 +40,8 @@
       </el-row>
       <el-table :data="caseList" border stripe max-height="450">
         <el-table-column label="ID" prop="id" width="100" fixed="left"></el-table-column>
-        <el-table-column label="用例标题" prop="test_name" width="250"></el-table-column>
-        <el-table-column label="用例描述" prop="test_content" width="550" :show-overflow-tooltip="true"></el-table-column>
+        <el-table-column label="用例标题" prop="test_name" min-width="250"></el-table-column>
+        <el-table-column label="用例描述" prop="test_content" min-width="550" :show-overflow-tooltip="true"></el-table-column>
         <el-table-column label="创建人" prop="create_user" width="150"></el-table-column>
         <el-table-column label="创建时间" prop="create_time" width="200"></el-table-column>
         <el-table-column label="操作" fixed="right" width="230" align="center">
@@ -98,6 +102,8 @@ import Message from 'element-ui'
 export default {
   data() {
     return {
+      // 接收创建用户
+      userList: [],
       // 接收返回的表格数据
       caseList: [],
       // 这是添加用户的表单
@@ -135,22 +141,7 @@ export default {
       },
       chose_user: '',
       chose_time: '',
-      options: [{
-        value: '选项1',
-        label: '黄金糕'
-      }, {
-        value: '选项2',
-        label: '双皮奶'
-      }, {
-        value: '选项3',
-        label: '蚵仔煎'
-      }, {
-        value: '选项4',
-        label: '龙须面'
-      }, {
-        value: '选项5',
-        label: '北京烤鸭'
-      }],
+      options: [],
       // 这是验证表单规则
       addCaseRules: {
         casename: [
@@ -192,9 +183,28 @@ export default {
   },
   created() {
     this.getCaseList()
+    this.showuser()
     console.log(this.caseList)
   },
   methods: {
+    getChoseUser(data) {
+      this.queryInfo.chose_option = data
+      this.getCaseList()
+    },
+    getChoseTime(time) {
+      if (time === null) {
+        this.queryInfo.start_time = ''
+        this.queryInfo.end_time = ''
+      } else {
+        this.queryInfo.start_time = time[0] + ' 00:00:00'
+        this.queryInfo.end_time = time[1] + ' 23:59:59'
+      }
+      this.getCaseList()
+    },
+    async showuser() {
+      const {data: res} = await this.$http.post('api/show-user/')
+      this.userList = res['data']
+    },
     // 跳转到用例的步骤页面
     to_step(case_id) {
       console.log(case_id)
@@ -240,19 +250,10 @@ export default {
             })
       })
     },
-    getCaseList() {
-      this.$http.post('api/show-case/')
-          .then((res) => {
-            if (res.data['code'] === 0) {
-              this.caseList = res.data['data']
-              this.total = res.data.total
-            } else {
-              Message.Message.error('网络错误')
-            }
-          })
-          .catch(() => {
-            Message.Message.error('网络错误')
-          })
+    async getCaseList() {
+      const {data: res} = await this.$http.post('api/show-case/', this.queryInfo)
+      this.caseList = res['data']
+      this.total = res.total
     },
   }
 }

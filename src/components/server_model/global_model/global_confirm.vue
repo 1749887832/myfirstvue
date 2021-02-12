@@ -259,7 +259,7 @@ export default {
         if (!res) return;
         const loading = this.$loading({
           lock: true,
-          text: '调试中',
+          text: '调试中..',
           spinner: 'el-icon-loading',
           background: 'rgba(0, 0, 0, 0.7)'
         })

@@ -62,13 +62,10 @@
                       :prop="'global_content.' + index + '.value'">
           <el-input v-model="domain.global_name" placeholder="参数的变量名"
                     style="width: 150px;margin-right: 20px"></el-input>
-          <el-input v-model="domain.argument" placeholder="参数名" style="width: 150px;margin-right: 20px"></el-input>
-          <el-input v-model="domain.index" placeholder="下标" style="width: 150px;margin-right: 20px"></el-input>
+          <el-input v-model="domain.urlarument" placeholder="参数名" style="width: 150px;margin-right: 20px"></el-input>
+          <el-input v-model="domain.urlindex" placeholder="下标" style="width: 150px;margin-right: 20px"></el-input>
           <template>
-              <span v-if="global_result[index].code === 0" style="color: #67C23A">
-                {{ global_result[index].msg }}
-              </span>
-            <span v-else style="color: #f56c6c">
+            <span style="color: #67C23A">
                 {{ global_result[index].msg }}
               </span>
           </template>
@@ -119,7 +116,7 @@ export default {
       type: Boolean,
       default: false
     },
-    case_id:{}
+    case_id: {}
   },
   data() {
     return {
@@ -140,16 +137,16 @@ export default {
       showglobals: false,
       // 表单数据
       stepFrom: {
-        case_id :this.case_id,
+        case_id: this.case_id,
         header_value: '',
         server_value: '',
         step_url: '',
         step_type: '',
         step_content: '',
         global_content: [{
-          argument: '',
+          urlarument: '',
           global_name: '',
-          index: '',
+          urlindex: '',
         }],
         assert_name: [{
           value: '0',
@@ -176,35 +173,15 @@ export default {
     }
   },
   created() {
-    //获取请求头
-    this.$http.post('api/show-headers/')
-        .then((res) => {
-          if (res.data['code'] === 0) {
-            this.header_list = res.data['data']
-            // 后面这里要判断一下，如果后端返回的为空，这里应该就会报错
-            this.stepFrom.header_value = this.header_list[0].id
-          } else {
-            Message.Message.error(res.data['msg'])
-          }
-        })
-        .catch(() => {
-          Message.Message.error('网络错误')
-        })
-    // 获取环境
-    this.$http.post('api/all-server/')
-        .then((res) => {
-          if (res.data['code'] === 0) {
-            this.server_list = res.data['data']
-            this.stepFrom.server_value = this.server_list[0].id
-          } else {
-            Message.Message.error(res.data['msg'])
-          }
-        })
-        .catch(() => {
-          Message.Message.error('网络错误')
-        })
+    this.getHeaderAndServer()
   },
   methods: {
+    async getHeaderAndServer(){
+      const {data:header} = await this.$http.post('api/show-headers/')
+      const {data:server}  = await this.$http.post('api/all-server/')
+      this.header_list = header['data']
+      this.server_list = server['data']
+    },
     addDomain() {
       this.assert_result.push({
         code: '',
@@ -264,10 +241,10 @@ export default {
         if (!res) return;
         this.$http.post('api/add-step/', this.stepFrom)
             .then((res) => {
-              if (res.data['code']===0){
+              if (res.data['code'] === 0) {
                 this.addStepClose()
                 Message.Message.success('添加成功')
-              }else{
+              } else {
                 Message.Message.success(res.data['msg'])
               }
             })
@@ -275,43 +252,40 @@ export default {
             })
       })
     },
-    Debugstep() {
+    async Debugstep() {
       this.$refs.addStepRef.validate(async res => {
         if (!res) return;
         const loading = this.$loading({
           lock: true,
-          text: 'Loading',
+          text: '调试中..',
           spinner: 'el-icon-loading',
           background: 'rgba(0, 0, 0, 0.7)'
         })
-        this.$http.post('api/debug-step/',
-            this.stepFrom)
-            .then((res) => {
-              if (res.data['code'] === 0 && res.data['data'].length !== 0) {
-                this.jsonData = res.data['data'][0]
-                this.assert_result = res.data['data'][1]
-                if (this.stepFrom.delivery) {
-                  this.global_result = res.data['data'][2]
-                } else {
-                  this.stepFrom.global_content = [{
-                    argument: '',
-                    global_name: '',
-                    index: '',
-                  }]
-                  this.global_result = [{
-                    'code': '',
-                    'msg': ''
-                  }]
-                }
-              } else {
-                Message.Message.error('调试失败')
-              }
-              loading.close()
-            },)
-            .catch(() => {
-              loading.close()
-              Message.Message.error('网络错误')
-            })
+        const {data: returnmsg} = await this.$http.post('api/debug-step/', this.stepFrom)
+        if (returnmsg['code'] === 0){
+          if (this.stepFrom.delivery){
+            this.global_result = returnmsg['data'][0]['list']['extend']
+          }else{
+            this.global_result =  [{
+              code: '',
+              msg: ''
+            }]
+          }
+          this.jsonData = returnmsg['data'][0]['list']['list']
+          this.assert_result = returnmsg['data'][0]['list']['assert_result']
+        }else{
+          this.jsonData = {}
+          // this.assert_result =  [{
+          //   code: '',
+          //   assert_result: '',
+          // }]
+          // this.global_result =  [{
+          //   code: '',
+          //   msg: ''
+          // }]
+        }
+        console.log(returnmsg)
+        loading.close()
       })
     },
     addStepClose() {

@@ -36,16 +36,15 @@
       </el-row>
       <el-button type="primary" style="margin-top: 15px" @click="openglobalConfirm">添加变量</el-button>
       <el-table :data="gloaballist" border stripe max-height="430">
-        <el-table-column label="ID" prop="id" width="100"></el-table-column>
-        <el-table-column label="变量名" prop="globals_name" width="150"></el-table-column>
-        <el-table-column label="使用名" prop="use_name" width="150"></el-table-column>
-        <el-table-column label="类型" prop="globals_type" width="100"></el-table-column>
-        <el-table-column label="状态" prop="use_type" width="100"></el-table-column>
-        <el-table-column label="参数变量" prop="cite_arguments" width="150"></el-table-column>
-        <el-table-column label="创建时间" prop="create_time" width="150"></el-table-column>
-        <el-table-column label="描述" prop="content" width="200"></el-table-column>
-        <el-table-column label="创建人" prop="create_user" width="100"></el-table-column>
-        <el-table-column label="操作" fixed="right" width="150">
+        <el-table-column label="ID" prop="id" width="100" min-width="100"></el-table-column>
+        <el-table-column label="变量名" prop="globals_name" width="150" min-width="150"></el-table-column>
+        <el-table-column label="使用名" prop="use_name" width="150" min-width="150"></el-table-column>
+        <el-table-column label="状态" prop="globals_type" width="100" min-width="100"></el-table-column>
+        <el-table-column label="类型" prop="use_type" width="100" min-width="100"></el-table-column>
+        <el-table-column label="创建时间" prop="create_time" width="150" min-width="150"></el-table-column>
+        <el-table-column label="描述" prop="content" width="200" min-width="200"></el-table-column>
+        <el-table-column label="创建人" prop="create_user" width="100" min-width="100"></el-table-column>
+        <el-table-column label="操作" fixed="right" width="150" min-width="150">
           <template slot-scope="scope">
             <el-tooltip effect="dark" content="修改" placement="top" :enterable="false">
               <el-button type="primary" icon="el-icon-edit"></el-button>

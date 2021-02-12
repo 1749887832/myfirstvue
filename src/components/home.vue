@@ -145,6 +145,20 @@ export default {
           'path': 'users8',
           'icon': 'el-icon-setting',
         },
+        {
+          'authName':'报告',
+          'children':[
+            {
+              'id':'5-1',
+              'name':'测试报告',
+              'path':'user10',
+              'icon':'el-icon-monitor',
+            },
+          ],
+          'id':5,
+          'path':'user11',
+          'icon':'el-icon-s-home'
+        }
       ],
       // 是否折叠
       isCollapse: false,
