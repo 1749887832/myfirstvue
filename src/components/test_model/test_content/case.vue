@@ -231,27 +231,18 @@ export default {
     addCaseClose() {
       this.$refs.addCaseRef.resetFields()
     },
-    addCaseFunc() {
+    async addCaseFunc() {
       this.$refs.addCaseRef.validate(async res => {
         console.log(res)
         if (!res) return;
-        this.$http.post('api/add-case/',
-            this.addCase)
-            .then((res) => {
-              if (res.data['code'] === 0) {
-                this.addCaseDilog = false
-                Message.Message.success(res.data['msg'])
-              } else {
-                Message.Message.error('添加失败')
-              }
-            })
-            .catch(() => {
-              Message.Message.error('网络错误')
-            })
+        const {data:msg} = await this.$http.post('api/add/case/', this.addCase)
+        this.addCaseDilog = false
+        Message.Message.success(msg['msg'])
+        this.getCaseList()
       })
     },
     async getCaseList() {
-      const {data: res} = await this.$http.post('api/show-case/', this.queryInfo)
+      const {data: res} = await this.$http.post('api/show/case/', this.queryInfo)
       this.caseList = res['data']
       this.total = res.total
     },
