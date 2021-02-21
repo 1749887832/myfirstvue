@@ -179,6 +179,12 @@ export default {
     async getHeaderAndServer(){
       const {data:header} = await this.$http.post('api/show-headers/')
       const {data:server}  = await this.$http.post('api/all-server/')
+      if (header['data'].length>0){
+        this.stepFrom.header_value = header['data'][0].id
+      }
+      if(server['data'].length>0){
+        this.stepFrom.server_value = server['data'][0].id
+      }
       this.header_list = header['data']
       this.server_list = server['data']
     },

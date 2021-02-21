@@ -41,7 +41,8 @@
       <el-table :data="caseList" border stripe max-height="450">
         <el-table-column label="ID" prop="id" width="100" fixed="left"></el-table-column>
         <el-table-column label="用例标题" prop="test_name" min-width="250"></el-table-column>
-        <el-table-column label="用例描述" prop="test_content" min-width="550" :show-overflow-tooltip="true"></el-table-column>
+        <el-table-column label="用例描述" prop="test_content" min-width="550"
+                         :show-overflow-tooltip="true"></el-table-column>
         <el-table-column label="创建人" prop="create_user" width="150"></el-table-column>
         <el-table-column label="创建时间" prop="create_time" width="200"></el-table-column>
         <el-table-column label="操作" fixed="right" width="230" align="center">
@@ -50,7 +51,8 @@
               <el-button type="primary" icon="el-icon-edit" size="mini"></el-button>
             </el-tooltip>
             <el-tooltip effect="dark" content="调试" placement="top" :enterable="false">
-              <el-button type="success" icon="el-icon-notebook-1" size="mini"></el-button>
+              <el-button type="success" icon="el-icon-notebook-1" size="mini"
+                         @click="openDebugConfirm(scope.row.id)"></el-button>
             </el-tooltip>
             <el-tooltip effect="dark" content="添加" placement="top" :enterable="false">
               <el-button type="warning" icon="el-icon-reading" size="mini" @click="to_step(scope.row.id)"></el-button>
@@ -93,15 +95,25 @@
         <el-button type="primary" @click="addCaseFunc">确 定</el-button>
       </span>
     </el-dialog>
+    <debugConfirm :visible.sync="visible"
+                  :testList.sync="testList"
+                  :serverList.sync="serverList"></debugConfirm>
   </div>
 </template>
 
 <script>
 import Message from 'element-ui'
+import debugConfirm from "@/components/test_model/test_content/debugStep/debugConfirm";
 
 export default {
+  components: {
+    debugConfirm
+  },
   data() {
     return {
+      serverList: [],
+      visible: false,
+      testList: [],
       // 接收创建用户
       userList: [],
       // 接收返回的表格数据
@@ -185,6 +197,7 @@ export default {
     this.getCaseList()
     this.showuser()
     console.log(this.caseList)
+    this.getAllServer()
   },
   methods: {
     getChoseUser(data) {
@@ -235,7 +248,7 @@ export default {
       this.$refs.addCaseRef.validate(async res => {
         console.log(res)
         if (!res) return;
-        const {data:msg} = await this.$http.post('api/add/case/', this.addCase)
+        const {data: msg} = await this.$http.post('api/add/case/', this.addCase)
         this.addCaseDilog = false
         Message.Message.success(msg['msg'])
         this.getCaseList()
@@ -246,6 +259,19 @@ export default {
       this.caseList = res['data']
       this.total = res.total
     },
+    openDebugConfirm(testId) {
+      this.visible = true
+      console.log(testId)
+      this.getAllCaseList(testId)
+    },
+    async getAllCaseList(testId) {
+      const {data: res} = await this.$http.post('api/show/allCase/', {"testID": testId})
+      this.testList = res['data']
+    },
+    async getAllServer() {
+      const {data: res} = await this.$http.post('api/all-server/')
+      this.serverList = res['data']
+    }
   }
 }
 
