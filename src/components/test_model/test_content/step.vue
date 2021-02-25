@@ -10,21 +10,25 @@
         <el-table-column type="selection" min-width="55"></el-table-column>
         <el-table-column label="ID" prop="id" min-width="100"></el-table-column>
         <el-table-column label="执行顺序" prop="order" min-width="100"></el-table-column>
-        <el-table-column label="接口地址" prop="step_url" min-width="400"></el-table-column>
+        <el-table-column label="接口地址" prop="step_url" min-width="400"
+                         :show-overflow-tooltip="true"></el-table-column>
         <el-table-column label="请求方式" prop="request_type" min-width="100"></el-table-column>
-        <el-table-column label="请求参数" prop="request_data" min-width="1000"
+        <el-table-column label="请求参数" prop="request_data" min-width="500"
+                         :show-overflow-tooltip="true">
+        </el-table-column>
+        <el-table-column label="变量名" prop="useGlobal" min-width="200"
+                         :show-overflow-tooltip="true"></el-table-column>
+        <el-table-column label="步骤描述" prop="step_content" min-width="200"
                          :show-overflow-tooltip="true"></el-table-column>
         <el-table-column label="创建时间" prop="create_time" min-width="150"></el-table-column>
         <el-table-column label="创建人" prop="create_user" min-width="150"></el-table-column>
         <el-table-column label="操作" fixed="right" min-width="150">
           <template slot-scope="scope">
-            <!--            修改按钮-->
             <el-tooltip effect="dark" content="修改" placement="top" :enterable="false">
               <el-button type="primary" icon="el-icon-edit"></el-button>
             </el-tooltip>
-            <!--            删除按钮-->
             <el-tooltip effect="dark" content="删除" placement="top" :enterable="false">
-              <el-button type="danger" icon="el-icon-delete"  @click="openStepDel(scope.row)"></el-button>
+              <el-button type="danger" icon="el-icon-delete" @click="openStepDel(scope.row)"></el-button>
             </el-tooltip>
           </template>
         </el-table-column>
@@ -90,7 +94,7 @@ export default {
       this.visible = true
     },
     async GetStepList() {
-      const {data: res} = await this.$http.post('api/show-step/', this.queryInfo)
+      const {data: res} = await this.$http.post('api/show/step/', this.queryInfo)
       this.total = res['total']
       this.step_list = res['data']
     },
@@ -108,8 +112,8 @@ export default {
         });
       });
     },
-    async DelStep(delsteplID){
-      const {data:res} = await this.$http.post('api/del-step/',delsteplID)
+    async DelStep(delsteplID) {
+      const {data: res} = await this.$http.post('api/del/step/', delsteplID)
       Message.success(res['msg'])
       this.GetStepList()
     }

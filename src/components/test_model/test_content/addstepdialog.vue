@@ -245,7 +245,7 @@ export default {
     addStep() {
       this.$refs.addStepRef.validate(async res => {
         if (!res) return;
-        this.$http.post('api/add-step/', this.stepFrom)
+        this.$http.post('api/add/step/', this.stepFrom)
             .then((res) => {
               if (res.data['code'] === 0) {
                 this.addStepClose()
@@ -267,7 +267,7 @@ export default {
           spinner: 'el-icon-loading',
           background: 'rgba(0, 0, 0, 0.7)'
         })
-        const {data: returnmsg} = await this.$http.post('api/debug-step/', this.stepFrom)
+        const {data: returnmsg} = await this.$http.post('api/debug/step/', this.stepFrom)
         if (returnmsg['code'] === 0){
           if (this.stepFrom.delivery){
             this.global_result = returnmsg['data'][0]['list']['extend']

@@ -37,7 +37,7 @@
           </el-date-picker>
         </el-col>
         <el-col :span="4">
-          <el-button type="primary">主要按钮</el-button>
+          <el-button type="primary" @click="openAddTest">新建测试单</el-button>
         </el-col>
       </el-row>
       <el-table :data="gloaballist" border stripe max-height="450">
@@ -71,15 +71,25 @@
           :total="total">
       </el-pagination>
     </el-card>
+    <addtest
+        :visible.sync="visible"
+    ></addtest>
   </div>
 </template>
 
 <script>
+
+import addtest from "@/components/test_model/test_content/addtestconfirm/addtest";
+
 export default {
-  data(){
-    return{
-      total:1,
-      gloaballist:[],
+  components: {
+    addtest
+  },
+  data() {
+    return {
+      visible: false,
+      total: 1,
+      gloaballist: [],
       queryInfo: {
         globalname: '',
         // 选项
@@ -92,8 +102,8 @@ export default {
         page: 1,
         limit: 10
       },
-      chose_user:'',
-      chose_time:'',
+      chose_user: '',
+      chose_time: '',
       options: [{
         value: '选项1',
         label: '黄金糕'
@@ -139,7 +149,7 @@ export default {
       },
     }
   },
-  methods:{
+  methods: {
     // 监听limit改变的事件
     handleSizeChange(newLimit) {
       this.queryInfo.limit = newLimit
@@ -150,6 +160,9 @@ export default {
       this.queryInfo.page = newPage
       this.getGloballist()
     },
+    openAddTest() {
+      this.visible = true
+    }
   }
 }
 </script>

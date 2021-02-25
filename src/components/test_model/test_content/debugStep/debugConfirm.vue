@@ -17,9 +17,23 @@
         style="width: 100%">
       <el-table-column type="expand">
         <template slot-scope="props">
-          <el-form label-position="left" inline class="demo-table-expand">
-            <el-form-item label="商品名称">
-              <span>{{ props.row.url }}</span>
+          <el-form label-position="left" class="demo-table-expand">
+            <el-form-item label="请求body：">
+              <span>{{ props.row.requestBody }}</span>
+            </el-form-item>
+            <el-form-item label="响应信息：">
+              <json-viewer :data="props.row.responseData" :expand-depth=1 :value="props.row.responseData"></json-viewer>
+            </el-form-item>
+            <el-form-item label="断言信息：">
+              <p v-for="assert in props.row.assertData" :key="assert.id">
+                <span>断言参数：{{ assert.argument }}</span>
+                <span>断言类型：{{ assert.type }}</span>
+                <span>断言期望：{{ assert.expect }}</span>
+                <el-tooltip class="item" effect="dark" :content="''+assert.result" placement="top-start">
+                  <span>实际结果：{{ assert.result }}</span>
+                </el-tooltip>
+                <span>断言结果：{{ assert.assert_result }}</span>
+              </p>
             </el-form-item>
           </el-form>
         </template>
@@ -81,9 +95,9 @@ export default {
   data() {
     return {
       queryInfo: {
-          testList:[],
-          serverId:'',
-        }
+        testList: [],
+        serverId: '',
+      }
     }
   },
   methods: {
@@ -93,16 +107,27 @@ export default {
       this.$emit('update:visible', false)
     },
     async debugTest() {
-      this.testList.forEach((item)=>{
+      this.testList.forEach((item) => {
         this.queryInfo.testList.push(item.id)
       })
-      if (this.queryInfo.serverId===''){
+      if (this.queryInfo.serverId === '') {
         Message.error('请选择服务地址')
-      }else{
+      } else {
+        const loading = this.$loading({
+          lock: true,
+          text: '调试中..',
+          spinner: 'el-icon-loading',
+          background: 'rgba(0, 0, 0, 0.7)'
+        })
         const {data: res} = await this.$http.post('api/debugTest/', this.queryInfo)
-        this.queryInfo.testList = []
-        console.log(res)
+        for (var i = 0; i < this.testList.length; i++) {
+          this.testList[i]['assertData'] = res['data'][i]['assertData']
+          this.testList[i]['requestBody'] = res['data'][i]['requestBody']
+          this.testList[i]['responseData'] = res['data'][i]['responseData']
+        }
+        loading.close()
       }
+      this.queryInfo.testList = []
     }
   }
 }
@@ -123,4 +148,28 @@ export default {
   margin-bottom: 0;
   width: 50%;
 }
+
+.demo-table-expand {
+  .el-form-item {
+    width: 100%;
+
+    p span {
+      float: left;
+      width: 20%;
+      height: 30px;
+      overflow: hidden;
+    }
+
+    /deep/ .el-form-item__label {
+      float: none;
+      color: #55e535;
+    }
+
+    /deep/ .el-form-item__content {
+      font-size: 12px;
+    }
+  }
+
+}
+
 </style>
