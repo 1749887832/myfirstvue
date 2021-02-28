@@ -212,9 +212,9 @@ export default {
   },
   methods: {
     async getServerAndHeader() {
-      const {data: server} = await this.$http.post('api/all-server/')
+      const {data: server} = await this.$http.post('api/server/query/')
       this.serverList = server['data']
-      const {data: header} = await this.$http.post('api/show-headers/')
+      const {data: header} = await this.$http.post('api/headers/query/')
       this.headersList = header['data']
     },
     CloseGlobalConfirm() {
@@ -245,7 +245,7 @@ export default {
     AddGloabalFun() {
       this.$refs.AddGloable.validate(async res => {
         if (!res) return;
-        const {data: msg} = await this.$http.post('api/add-global/', this.AddglobalValue)
+        const {data: msg} = await this.$http.post('api/global/add/', this.AddglobalValue)
         if (msg['code'] === 0) {
           Message.success(msg['msg'])
           this.CloseGlobalConfirm()
@@ -263,7 +263,7 @@ export default {
           spinner: 'el-icon-loading',
           background: 'rgba(0, 0, 0, 0.7)'
         })
-        const {data: returnmsg} = await this.$http.post('api/debug-api/', this.AddglobalValue)
+        const {data: returnmsg} = await this.$http.post('api/global/debug/', this.AddglobalValue)
         if (returnmsg['code'] === 0) {
           this.returnvaue = ''
           this.jsonData = returnmsg['data']['list']

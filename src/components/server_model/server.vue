@@ -161,7 +161,7 @@ export default {
   },
   methods: {
     async getServerList() {
-      const {data: res} = await this.$http.post('api/all-server/', this.queryInfo)
+      const {data: res} = await this.$http.post('api/server/query/', this.queryInfo)
       this.serverlist = res['data']
       this.total = res['total']
     },
@@ -177,14 +177,14 @@ export default {
     },
     // 监听状态改变
     async serverChange(serverinfo) {
-      const {data: res} = await this.$http.post('api/update-server/', serverinfo)
+      const {data: res} = await this.$http.post('api/server/update/', serverinfo)
       Message.Message.success(res['msg'])
     },
     // 调用添加的接口
     async addDialogServer() {
       this.$refs.addFormRef.validate(async res => {
         if (!res) return;
-        const {data: content} = await this.$http.post('api/add-server/', this.addServer)
+        const {data: content} = await this.$http.post('api/server/add/', this.addServer)
         this.addDialogVisible = false
         Message.Message.success(content['msg'])
         this.getServerList()
@@ -216,7 +216,7 @@ export default {
     },
     // 调用删除接口
     RemoveServer(deleteservername) {
-      this.$http.post('api/delete-server/',
+      this.$http.post('api/server/delete/',
           deleteservername)
           .then((res) => {
             if (res.data['code'] === 0) {
@@ -242,7 +242,7 @@ export default {
     editDialogServer() {
       this.$refs.editFormRef.validate(async res => {
         if (!res) return;
-        this.$http.post('api/editserver/',
+        this.$http.post('api/server/edit/',
             this.editServer)
             .then((res) => {
               if (res.data['code'] === 0) {

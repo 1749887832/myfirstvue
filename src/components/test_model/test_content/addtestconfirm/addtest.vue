@@ -40,7 +40,7 @@
     </el-form>
     <div slot="footer" class="dialog-footer">
       <el-button @click="CloseAddTest">取 消</el-button>
-      <el-button type="primary" @click="AddTest()">确 定</el-button>
+      <el-button type="primary" @click="AddTest">确 定</el-button>
     </div>
   </el-dialog>
 </template>
@@ -92,7 +92,7 @@ export default {
   },
   methods: {
     async GetAllUser() {
-      const {data: user} = await this.$http.post('api/show-user/')
+      const {data: user} = await this.$http.post('api/show/user/')
       this.userList = user['data']
     },
     CloseAddTest() {

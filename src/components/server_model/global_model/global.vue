@@ -131,7 +131,7 @@ export default {
   methods: {
     // 获取全部的用户
     async getalluser(){
-      const {data:res} = await this.$http.post('api/show-user/')
+      const {data:res} = await this.$http.post('api/user/query/')
       this.userlist = res['data']
     },
     // 监听limit改变的事件
@@ -145,7 +145,7 @@ export default {
       this.getGloballist()
     },
     async getGloballist() {
-      const {data: res} = await this.$http.post('api/show-global/', this.queryInfo)
+      const {data: res} = await this.$http.post('api/global/query/', this.queryInfo)
       this.gloaballist = res['data']
       this.total = res['total']
     },
@@ -170,7 +170,7 @@ export default {
       this.visible = true
     },
     async delglobal(delglobalID) {
-      const {data: res} =await this.$http.post('api/del-global/', delglobalID)
+      const {data: res} =await this.$http.post('api/global/delete/', delglobalID)
       Message.Message.success(res['msg'])
       this.getGloballist()
     },

@@ -215,7 +215,7 @@ export default {
       this.getCaseList()
     },
     async showuser() {
-      const {data: res} = await this.$http.post('api/show-user/')
+      const {data: res} = await this.$http.post('api/show/user/')
       this.userList = res['data']
     },
     // 跳转到用例的步骤页面
@@ -269,7 +269,7 @@ export default {
       this.testList = res['data']
     },
     async getAllServer() {
-      const {data: res} = await this.$http.post('api/all-server/')
+      const {data: res} = await this.$http.post('api/server/query/')
       this.serverList = res['data']
     }
   }

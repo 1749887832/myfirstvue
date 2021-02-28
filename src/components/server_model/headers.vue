@@ -81,7 +81,7 @@ export default {
   },
   methods: {
     getHeaders() {
-      this.$http.post('api/show-headers/')
+      this.$http.post('api/headers/query/')
           .then((res) => {
             console.log(res)
             this.headers_list = res.data['data']
@@ -96,7 +96,7 @@ export default {
     },
     addheader() {
       console.log(this.addHeaders)
-      this.$http.post('api/add-headers/',
+      this.$http.post('api/headers/add/',
           this.addHeaders)
           .then((res) => {
             if (res.data['code'] === 0){
